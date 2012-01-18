@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{2857B73E-F847-4B02-9238-064979017E93}") = "ngpod", "ngpod\ngpod.cproj", "{94C51992-3915-4E4E-9888-0FC08515C675}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{94C51992-3915-4E4E-9888-0FC08515C675}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94C51992-3915-4E4E-9888-0FC08515C675}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94C51992-3915-4E4E-9888-0FC08515C675}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94C51992-3915-4E4E-9888-0FC08515C675}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = ngpod\ngpod.cproj
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.inheritsSet = null
+		$1.scope = text/x-csrc
+		$0.TextStylePolicy = $2
+		$2.FileWidth = 120
+		$2.inheritsSet = VisualStudio
+		$2.inheritsScope = text/plain
+		$2.scope = text/plain
+		$0.TextStylePolicy = $3
+		$3.inheritsSet = null
+		$3.scope = text/x-chdr
+	EndGlobalSection
+EndGlobal
