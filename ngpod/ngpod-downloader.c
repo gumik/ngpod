@@ -12,6 +12,14 @@ struct _NgpodDownloaderPrivate
     gchar *resolution;
 };
 
+enum
+{
+    DOWNLOAD_FINISHED,
+    SIGNALS_NUM
+};
+
+static guint signals[SIGNALS_NUM];
+
 G_DEFINE_TYPE (NgpodDownloader, ngpod_downloader, G_TYPE_OBJECT);
 
 static void
@@ -60,6 +68,17 @@ ngpod_downloader_class_init (NgpodDownloaderClass *klass)
     gobject_class->finalize = ngpod_downloader_finalize;
     
     g_type_class_add_private (klass, sizeof (NgpodDownloaderPrivate));
+    
+    signals[DOWNLOAD_FINISHED] = g_signal_newv ("download-finished",
+                 G_TYPE_OBJECT,
+                 G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+                 NULL /* closure */,
+                 NULL /* accumulator */,
+                 NULL /* accumulator data */,
+                 g_cclosure_marshal_VOID__VOID,
+                 G_TYPE_NONE /* return_type */,
+                 0     /* n_params */,
+                 NULL  /* param_types */);
 }
 
 static void
@@ -70,6 +89,8 @@ ngpod_downloader_init (NgpodDownloader *self)
     
     priv->session = soup_session_async_new ();
     priv->date = NULL;
+    priv->link = NULL;
+    priv->resolution = NULL;
 }
 
 NgpodDownloader *
@@ -94,6 +115,7 @@ static void site_download_callback (SoupSession *session, SoupMessage *msg, gpoi
 static gint regex_substr (const gchar *text, gchar *regex_text, gchar ***result);
 static void regex_substr_free (gchar ***result, gint count);
 static GDate* date_from_strings (gchar ***strs);
+static void emit_download_finished (NgpodDownloader *self);
 
 void 
 ngpod_downloader_start (NgpodDownloader *self)
@@ -116,11 +138,18 @@ static void
 site_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_data)
 {   
     NgpodDownloaderPrivate *priv;
-    priv = GET_PRIVATE ( NGPOD_DOWNLOADER (user_data));
+    NgpodDownloader *self = NGPOD_DOWNLOADER (user_data);
+    priv = GET_PRIVATE (self);
     
     SoupMessageBody *body;
     g_object_get (msg, "response-body", &body, NULL);
     //printf("callback:\n%s\n", body->data);
+    
+    if (body->data == NULL)
+    {
+        emit_download_finished (self);
+        return;
+    }
     
     gchar **substrs;
     guint count = regex_substr (body->data, "<p class=\"publication_time\">([^<]{3})[^<]* ([^<]*), ([^<]*)</p>", &substrs);
@@ -140,13 +169,30 @@ site_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_da
     
     count = regex_substr (body->data, "<div class=\"download_link\">[^<]*<a href=\"([^>]*)\">Download Wallpaper \\((.*) pixels\\)</a>[^<]*</div>", &substrs);
     
-    if (count >= 1) printf ("found link: %s\n", substrs[0]);
-    if (count >= 2) printf ("found resolution: %s\n", substrs[1]);
+    if (count >= 1) 
+    {
+        printf ("found link: %s\n", substrs[0]);
+        priv->link = substrs[0];
+    }
     
-    priv->link = substrs[0];
-    priv->resolution = substrs[1];
+    if (count >= 2)
+    {
+        printf ("found resolution: %s\n", substrs[1]);
+        priv->resolution = substrs[1];
+    }
     
-    g_free (substrs);
+    if (count)
+    {
+        g_free (substrs);
+    }
+    
+    emit_download_finished (self);
+}
+
+static void
+emit_download_finished (NgpodDownloader *self)
+{
+    g_signal_emit (self, signals[DOWNLOAD_FINISHED], 0);
 }
 
 static gint
@@ -197,7 +243,10 @@ regex_substr_free (gchar ***result, gint count)
         g_free ((*result)[i]);
     }
     
-    g_free (*result);
+    if (count)
+    {
+        g_free (*result);
+    }
 }
 
 static const gchar *months[] =

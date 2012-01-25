@@ -3,6 +3,15 @@
 #include "ngpod-downloader.h"
 #include <stdio.h>
 
+GMainLoop *main_loop;
+
+void
+download_finished_event ()
+{
+    printf ("download finished\n");
+    g_main_loop_quit (main_loop);
+}
+
 int main (int argc, char **argv) 
  {
     //NgpodPictureWin *win;
@@ -46,9 +55,10 @@ int main (int argc, char **argv)
     g_match_info_free (match_info);*/
     
     GMainContext *context = g_main_context_default ();
-    GMainLoop *main_loop = g_main_loop_new (context, FALSE);
+    main_loop = g_main_loop_new (context, FALSE);
     
     NgpodDownloader *downloader = ngpod_downloader_new ();
+    g_signal_connect (downloader, "download-finished", G_CALLBACK (download_finished_event), NULL);
     ngpod_downloader_start (downloader);
     
     g_main_loop_run (main_loop);
