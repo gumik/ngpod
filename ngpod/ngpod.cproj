@@ -38,8 +38,10 @@
   <ItemGroup>
     <Compile Include="main.c" />
     <Compile Include="ngpod-downloader.c" />
+    <Compile Include="utils.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ngpod-downloader.h" />
+    <None Include="utils.h" />
   </ItemGroup>
 </Project>
