@@ -5,4 +5,4 @@
 
 void unref_if_not_null (GObject *object);
 
-#endif 
+#endif

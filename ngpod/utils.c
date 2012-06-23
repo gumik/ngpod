@@ -1,6 +1,6 @@
 #include "utils.h"
 
-void 
+void
 unref_if_not_null (GObject *object)
 {
     if (object)

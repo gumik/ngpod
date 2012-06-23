@@ -20,7 +20,7 @@ struct _NgpodDownloader
     NgpodDownloaderPrivate *priv;
 };
 
-struct _NgpodDownloaderClass 
+struct _NgpodDownloaderClass
 {
     GObjectClass parent_class;
 };

@@ -2,10 +2,11 @@
 #include "utils.h"
 #include <libsoup/soup.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE ((obj), NGPOD_TYPE_DOWNLOADER, NgpodDownloaderPrivate))
 
-struct _NgpodDownloaderPrivate 
+struct _NgpodDownloaderPrivate
 {
     SoupSession *session;
     GDate *date;
@@ -32,10 +33,10 @@ ngpod_downloader_dispose (GObject *gobject)
 {
     NgpodDownloader *self = NGPOD_DOWNLOADER (gobject);
 
-    /* 
+    /*
     * In dispose, you are supposed to free all types referenced from this
     * object which might themselves hold a reference to self. Generally,
-    * the most simple solution is to unref all members on which you own a 
+    * the most simple solution is to unref all members on which you own a
     * reference.
     */
 
@@ -66,15 +67,15 @@ ngpod_downloader_finalize (GObject *gobject)
 }
 
 static void
-ngpod_downloader_class_init (NgpodDownloaderClass *klass) 
+ngpod_downloader_class_init (NgpodDownloaderClass *klass)
 {
     GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
     gobject_class->dispose = ngpod_downloader_dispose;
     gobject_class->finalize = ngpod_downloader_finalize;
-    
+
     g_type_class_add_private (klass, sizeof (NgpodDownloaderPrivate));
-    
+
     /* signals */
     signals[DOWNLOAD_FINISHED] = g_signal_newv ("download-finished",
                  G_TYPE_OBJECT,
@@ -93,7 +94,7 @@ ngpod_downloader_init (NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv;
     self->priv = priv = GET_PRIVATE (self);
-    
+
     priv->session = soup_session_async_new ();
     priv->date = NULL;
     priv->link = NULL;
@@ -120,7 +121,7 @@ static gchar *ngpod_url = "http://photography.nationalgeographic.com/photography
 /*
  * public functions implementation
  */
- 
+
 static void site_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_data);
 static gint regex_substr (const gchar *text, gchar *regex_text, gchar ***result);
 static void regex_substr_free (gchar ***result, gint count);
@@ -129,55 +130,53 @@ static void emit_download_finished (NgpodDownloader *self);
 static void download_image (NgpodDownloader *self);
 static void image_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_data);
 
-void 
+void
 ngpod_downloader_start (NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
-    
+
     SoupSession *soup_session = priv->session;
     SoupMessage *msg = soup_message_new("GET", ngpod_url);
-    
+
     soup_session_queue_message (soup_session, msg, site_download_callback, self);
-    
-    //g_object_unref (msg);
 }
 
-const GDate* 
+const GDate*
 ngpod_downloader_get_date (NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     return priv->date;
 }
 
-const gchar* 
+const gchar*
 ngpod_downloader_get_link (NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     return priv->link;
 }
 
-const gchar* 
+const gchar*
 ngpod_downloader_get_resolution (NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     return priv->resolution;
 }
 
-gboolean 
+gboolean
 ngpod_downloader_is_success (NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     return priv->success;
 }
 
-const char* 
+const char*
 ngpod_downloader_get_data (NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     return priv->data;
 }
 
-gsize 
+gsize
 ngpod_downloader_get_data_length (NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
@@ -187,88 +186,86 @@ ngpod_downloader_get_data_length (NgpodDownloader *self)
 /*
  * private functions
  */
-static void 
+static void
 site_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_data)
-{   
+{
     NgpodDownloaderPrivate *priv;
     NgpodDownloader *self = NGPOD_DOWNLOADER (user_data);
     priv = GET_PRIVATE (self);
-    
+
     SoupMessageBody *body;
     g_object_get (msg, "response-body", &body, NULL);
-    
+
     if (body->data == NULL)
     {
         priv->success = FALSE;
         emit_download_finished (self);
         return;
     }
-    
+
     gchar **substrs;
     guint count = regex_substr (body->data, "<p class=\"publication_time\">([^<]{3})[^<]* ([^<]*), ([^<]*)</p>", &substrs);
-    
-    
+
+
     if (count == 3)
     {
         priv->date = date_from_strings (&substrs);
     }
-    
+
     regex_substr_free (&substrs, count);
-    
+
     count = regex_substr (body->data, "<div class=\"download_link\">[^<]*<a href=\"([^>]*)\">Download Wallpaper \\((.*) pixels\\)</a>[^<]*</div>", &substrs);
-    
+
     if (count >= 2)
     {
         priv->resolution = substrs[1];
         priv->link = substrs[0];
     }
-    else    
+    else
     {
         priv->success = FALSE;
         emit_download_finished (self);
         return;
     }
-    
+
     if (count)
     {
         g_free (substrs);
     }
-    
+
     download_image (self);
-    //priv->success = TRUE;
-    //emit_download_finished (self);
 }
 
 static void
 download_image (NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
-    
+
     SoupSession *soup_session = priv->session;
     SoupMessage *msg = soup_message_new("GET", priv->link);
-    
+
     soup_session_queue_message (soup_session, msg, image_download_callback, self);
 }
 
-static void 
+static void
 image_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_data)
-{    
+{
     NgpodDownloader *self = NGPOD_DOWNLOADER (user_data);
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
-    
+
     priv->image_response_message = msg;
     g_object_ref (msg);
-    
+
     guint status_code;
     g_object_get (msg, "status-code", &status_code, NULL);
-    
+
     if (status_code != 200)
     {
         priv->success = FALSE;
         emit_download_finished (self);
         return;
     }
-    
+
     SoupMessageBody *body;
     g_object_get (msg, "response-body", &body, NULL);
     priv->data = body->data;
@@ -289,19 +286,19 @@ regex_substr (const gchar *text, gchar *regex_text, gchar ***result)
     GError *error = NULL;
     GRegex *regex = g_regex_new (regex_text, 0, 0, &error);
     g_return_val_if_fail (!error, 0);
-    
+
     GMatchInfo *match_info;
     if (!g_regex_match (regex, text, 0, &match_info))
     {
         return 0;
     }
-    
+
     int match_count = g_match_info_get_match_count (match_info);
     if (match_count < 2)
     {
         return 0;
-    }    
-    
+    }
+
     *result = g_new (gchar*, match_count - 1);
 
     int i;
@@ -312,10 +309,10 @@ regex_substr (const gchar *text, gchar *regex_text, gchar ***result)
         g_match_info_fetch_pos (match_info, i + 1, &start_pos, &end_pos);
         (*result)[i] = g_strndup (text + start_pos, end_pos - start_pos);
     }
-    
+
     g_regex_unref (regex);
     g_match_info_free (match_info);
-    
+
     return match_count - 1;
 }
 
@@ -327,7 +324,7 @@ regex_substr_free (gchar ***result, gint count)
     {
         g_free ((*result)[i]);
     }
-    
+
     if (count)
     {
         g_free (*result);
@@ -353,7 +350,7 @@ static GDate*
 date_from_strings (gchar ***strs)
 {
     GDate *date = g_date_new ();
-    
+
     gint i;
     gboolean found_month = FALSE;
     for (i = 0; i < 12; ++i)
@@ -365,11 +362,11 @@ date_from_strings (gchar ***strs)
             break;
         }
     }
-    
+
     if (!found_month) return NULL;
-    
+
     g_date_set_day (date, atoi ((*strs)[1]));
     g_date_set_year (date, atoi ((*strs)[2]));
-    
+
     return date;
 }
