@@ -2,3 +2,8 @@ ngpod/bin
 *.pidb
 *.userprefs
 ngpod.sublime-workspace
+
+ngpod/CMakeFiles/
+ngpod/CMakeCache.txt
+ngpod/Makefile
+ngpod/cmake_install.cmake
