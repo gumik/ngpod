@@ -114,9 +114,7 @@ ngpod_downloader_new (void)
 /*
  * constant fields
  */
-
-static gchar *ngpod_url = "http://photography.nationalgeographic.com/photography/photo-of-the-day";
-
+const gchar *NGPOD_DOWNLOADER_DEFAULT_URL = "http://photography.nationalgeographic.com/photography/photo-of-the-day";
 
 /*
  * public functions implementation
@@ -131,12 +129,12 @@ static void download_image (NgpodDownloader *self);
 static void image_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_data);
 
 void
-ngpod_downloader_start (NgpodDownloader *self)
+ngpod_downloader_start (NgpodDownloader *self, const gchar *url)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
 
     SoupSession *soup_session = priv->session;
-    SoupMessage *msg = soup_message_new("GET", ngpod_url);
+    SoupMessage *msg = soup_message_new("GET", url);
 
     soup_session_queue_message (soup_session, msg, site_download_callback, self);
 }
@@ -355,7 +353,7 @@ date_from_strings (gchar ***strs)
     gboolean found_month = FALSE;
     for (i = 0; i < 12; ++i)
     {
-        if (g_strcmp0 (months[i], (*strs)[i]) == 0)
+        if (g_strcmp0 (months[i], (*strs)[0]) == 0)
         {
             g_date_set_month (date, i + 1);
             found_month = TRUE;

@@ -30,9 +30,14 @@ GType ngpod_downloader_get_type (void);
 NgpodDownloader *ngpod_downloader_new (void);
 
 /*
+ * Static fields
+ */
+const gchar *NGPOD_DOWNLOADER_DEFAULT_URL;
+
+/*
  * Method definitions.
  */
-void ngpod_downloader_start (NgpodDownloader *self);
+void ngpod_downloader_start (NgpodDownloader *self, const gchar *url);
 const GDate* ngpod_downloader_get_date (NgpodDownloader *self);
 const gchar* ngpod_downloader_get_link (NgpodDownloader *self);
 const gchar* ngpod_downloader_get_resolution (NgpodDownloader *self);

@@ -54,7 +54,7 @@ int main (int argc, char **argv)
 
     downloader = ngpod_downloader_new ();
     g_signal_connect (downloader, "download-finished", G_CALLBACK (download_finished_event), NULL);
-    ngpod_downloader_start (downloader);
+    ngpod_downloader_start (downloader, NGPOD_DOWNLOADER_DEFAULT_URL);
 
     g_main_loop_run (main_loop);
 }
