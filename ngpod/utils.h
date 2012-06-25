@@ -2,7 +2,8 @@
 #define __NGPOD_UTILS_H
 
 #include <glib-object.h>
+#include <glib.h>
 
-void unref_if_not_null (GObject *object);
+guint create_void_void_signal (const gchar *signal_name);
 
 #endif

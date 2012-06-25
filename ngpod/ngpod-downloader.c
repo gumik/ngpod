@@ -60,7 +60,7 @@ ngpod_downloader_finalize (GObject *gobject)
 
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     g_object_unref (priv->session);
-    unref_if_not_null (G_OBJECT (priv->image_response_message));
+    g_clear_object (&priv->image_response_message);
 
     /* Chain up to the parent class */
     G_OBJECT_CLASS (ngpod_downloader_parent_class)->finalize (gobject);
@@ -102,6 +102,7 @@ ngpod_downloader_init (NgpodDownloader *self)
     priv->data = NULL;
     priv->data_length = 0;
     priv->success = FALSE;
+    priv->image_response_message = NULL;
 }
 
 NgpodDownloader *
