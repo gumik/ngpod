@@ -23,6 +23,7 @@ G_DEFINE_TYPE (NgpodWatcher, ngpod_watcher, G_TYPE_OBJECT);
 
 static void download_finished_event(NgpodDownloader *downloader, gpointer data);
 static gboolean is_download_needed (NgpodWatcher *self, GDateTime *now);
+static void update_last_date (NgpodWatcher *self, const GDate *date);
 
 static void
 ngpod_watcher_dispose (GObject *gobject)
@@ -134,22 +135,32 @@ download_finished_event (NgpodDownloader *downloader, gpointer data)
     NgpodWatcherPrivate *priv = GET_PRIVATE (self);
 
     NgpodWatcherStatus status = NGPOD_WATCHER_STATUS_INVALID;
+    NgpodDownloaderStatus downloader_status = ngpod_downloader_get_status (downloader);
+    const GDate *date = ngpod_downloader_get_date (downloader);
 
-    if (ngpod_downloader_is_success (downloader))
+    switch (downloader_status)
     {
-        const GDate *date = ngpod_downloader_get_date (downloader);
-        if (g_date_compare (date, priv->last_date) <= 0)
-        {
+        case NGPOD_DOWNLOADER_STATUS_SUCCESS:
+            if (g_date_compare (date, priv->last_date) <= 0)
+            {
+                status = NGPOD_WATCHER_STATUS_SUCCESSFUL_NOT_NEEDED;
+            }
+            else
+            {
+                status = NGPOD_WATCHER_STATUS_SUCCESSFUL;
+                update_last_date (self, date);
+            }
+            break;
+
+        case NGPOD_DOWNLOADER_STATUS_SUCCESS_NO_IMAGE:
+            update_last_date (self, date);
             status = NGPOD_WATCHER_STATUS_SUCCESSFUL_NOT_NEEDED;
-        }
-        else
-        {
-            status = NGPOD_WATCHER_STATUS_SUCCESSFUL;
-        }
-    }
-    else
-    {
-        status = NGPOD_WATCHER_STATUS_FAILED;
+            break;
+
+        case NGPOD_DOWNLOADER_STATUS_FAILED:
+        case NGPOD_DOWNLOADER_STATUS_FAILED_GET_IMAGE:
+            status = NGPOD_WATCHER_STATUS_FAILED;
+            break;
     }
 
     priv->status = status;
@@ -176,4 +187,16 @@ is_download_needed(NgpodWatcher *self, GDateTime *now)
     g_date_time_unref (last_date_time_added);
 
     return diff <= 0;
+}
+
+static void
+update_last_date (NgpodWatcher *self, const GDate *date)
+{
+    NgpodWatcherPrivate *priv = GET_PRIVATE (self);
+
+    g_date_set_dmy (
+        priv->last_date,
+        g_date_get_day (date),
+        g_date_get_month (date),
+        g_date_get_year (date));
 }

@@ -15,7 +15,7 @@ struct _NgpodDownloaderPrivate
     SoupMessage *image_response_message;
     const char *data;
     gsize data_length;
-    gboolean success;
+    NgpodDownloaderStatus status;
 };
 
 enum
@@ -101,7 +101,7 @@ ngpod_downloader_init (NgpodDownloader *self)
     priv->resolution = NULL;
     priv->data = NULL;
     priv->data_length = 0;
-    priv->success = FALSE;
+    priv->status = NGPOD_DOWNLOADER_STATUS_FAILED;
     priv->image_response_message = NULL;
 }
 
@@ -161,13 +161,6 @@ ngpod_downloader_get_resolution (NgpodDownloader *self)
     return priv->resolution;
 }
 
-gboolean
-ngpod_downloader_is_success (NgpodDownloader *self)
-{
-    NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
-    return priv->success;
-}
-
 const char*
 ngpod_downloader_get_data (NgpodDownloader *self)
 {
@@ -180,6 +173,21 @@ ngpod_downloader_get_data_length (NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     return priv->data_length;
+}
+
+gboolean
+ngpod_downloader_is_success (NgpodDownloader *self)
+{
+    NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
+    return priv->status == NGPOD_DOWNLOADER_STATUS_SUCCESS ||
+        priv->status == NGPOD_DOWNLOADER_STATUS_SUCCESS_NO_IMAGE;
+}
+
+NgpodDownloaderStatus
+ngpod_downloader_get_status (NgpodDownloader *self)
+{
+    NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
+    return priv->status;
 }
 
 /*
@@ -197,7 +205,7 @@ site_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_da
 
     if (body->data == NULL)
     {
-        priv->success = FALSE;
+        priv->status = NGPOD_DOWNLOADER_STATUS_FAILED;
         emit_download_finished (self);
         return;
     }
@@ -222,7 +230,7 @@ site_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_da
     }
     else
     {
-        priv->success = FALSE;
+        priv->status = NGPOD_DOWNLOADER_STATUS_SUCCESS_NO_IMAGE;
         emit_download_finished (self);
         return;
     }
@@ -260,7 +268,7 @@ image_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_d
 
     if (status_code != 200)
     {
-        priv->success = FALSE;
+        priv->status = NGPOD_DOWNLOADER_STATUS_FAILED_GET_IMAGE;
         emit_download_finished (self);
         return;
     }
@@ -269,7 +277,7 @@ image_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_d
     g_object_get (msg, "response-body", &body, NULL);
     priv->data = body->data;
     priv->data_length = body->length;
-    priv->success = TRUE;
+    priv->status = NGPOD_DOWNLOADER_STATUS_SUCCESS;
     emit_download_finished (self);
 }
 

@@ -14,6 +14,14 @@ typedef struct _NgpodDownloader        NgpodDownloader;
 typedef struct _NgpodDownloaderClass   NgpodDownloaderClass;
 typedef struct _NgpodDownloaderPrivate NgpodDownloaderPrivate;
 
+typedef enum
+{
+	NGPOD_DOWNLOADER_STATUS_SUCCESS,
+	NGPOD_DOWNLOADER_STATUS_SUCCESS_NO_IMAGE,
+	NGPOD_DOWNLOADER_STATUS_FAILED,
+	NGPOD_DOWNLOADER_STATUS_FAILED_GET_IMAGE
+} NgpodDownloaderStatus;
+
 struct _NgpodDownloader
 {
     GObject          parent_instance;
@@ -44,5 +52,6 @@ const gchar* ngpod_downloader_get_resolution (NgpodDownloader *self);
 const char* ngpod_downloader_get_data (NgpodDownloader *self);
 gsize ngpod_downloader_get_data_length (NgpodDownloader *self);
 gboolean ngpod_downloader_is_success (NgpodDownloader *self);
+NgpodDownloaderStatus ngpod_downloader_get_status (NgpodDownloader *self);
 
 #endif /* __NGPOD_DOWNLOADER_H__ */
