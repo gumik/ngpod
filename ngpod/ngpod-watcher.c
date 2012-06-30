@@ -113,10 +113,17 @@ ngpod_watcher_tick(NgpodWatcher *self, GDateTime *now)
 }
 
 NgpodWatcherStatus
-ngpod_watcher_get_status (NgpodWatcher *self)
+ngpod_watcher_get_status (const NgpodWatcher *self)
 {
     NgpodWatcherPrivate *priv = GET_PRIVATE (self);
     return priv->status;
+}
+
+const NgpodDownloader *
+ngpod_watcher_get_downloader (const NgpodWatcher *self)
+{
+    NgpodWatcherPrivate *priv = GET_PRIVATE (self);
+    return priv->downloader;
 }
 
 void
@@ -141,29 +148,21 @@ download_finished_event (NgpodDownloader *downloader, gpointer data)
     switch (downloader_status)
     {
         case NGPOD_DOWNLOADER_STATUS_SUCCESS:
-            if (g_date_compare (date, priv->last_date) <= 0)
+            if (g_date_compare (date, priv->last_date) > 0)
             {
-                status = NGPOD_WATCHER_STATUS_SUCCESSFUL_NOT_NEEDED;
-            }
-            else
-            {
-                status = NGPOD_WATCHER_STATUS_SUCCESSFUL;
                 update_last_date (self, date);
             }
             break;
 
         case NGPOD_DOWNLOADER_STATUS_SUCCESS_NO_IMAGE:
             update_last_date (self, date);
-            status = NGPOD_WATCHER_STATUS_SUCCESSFUL_NOT_NEEDED;
             break;
 
-        case NGPOD_DOWNLOADER_STATUS_FAILED:
-        case NGPOD_DOWNLOADER_STATUS_FAILED_GET_IMAGE:
-            status = NGPOD_WATCHER_STATUS_FAILED;
+        default:
             break;
     }
 
-    priv->status = status;
+    priv->status = NGPOD_WATCHER_STATUS_UPDATED;
     g_signal_emit (self, signals[UPDATE_FINISHED], 0);
 }
 

@@ -16,6 +16,7 @@ static const int SUCCESS_TIMEOUT = 1;
 
 static gboolean ngpod_timer_tick (gpointer data);
 static void watcher_finished_event (NgpodWatcher *watche, gpointer data);
+static void add_timeout (NgpodTimer *self, gint seconds);
 
 static void
 ngpod_timer_dispose (GObject *gobject)
@@ -88,7 +89,7 @@ ngpod_timer_new (NgpodWatcher *watcher)
 void
 ngpod_timer_start (NgpodTimer *self)
 {
-    g_timeout_add_seconds(1, ngpod_timer_tick, (gpointer) self);
+    add_timeout (self, 1);
 }
 
 /* private functions */
@@ -108,28 +109,46 @@ ngpod_timer_tick (gpointer data)
 static void
 watcher_finished_event (NgpodWatcher *watcher, gpointer data)
 {
+    NgpodTimer *self = (NgpodTimer *) data;
     NgpodWatcherStatus status = ngpod_watcher_get_status (watcher);
 
-    switch (status)
+    if (status == NGPOD_WATCHER_STATUS_NOT_NEEDED)
     {
-        case NGPOD_WATCHER_STATUS_NOT_NEEDED:
-            g_log ("NgpodTimer", G_LOG_LEVEL_MESSAGE, "NOT_NEEDED");
-            g_timeout_add_seconds (NOT_NEEDED_TIMEOUT, ngpod_timer_tick, data);
-            break;
-
-        case NGPOD_WATCHER_STATUS_FAILED:
-            g_log ("NgpodTimer", G_LOG_LEVEL_MESSAGE, "FAILED");
-            g_timeout_add_seconds (FAILED_TIMEOUT, ngpod_timer_tick, data);
-            break;
-
-        case NGPOD_WATCHER_STATUS_SUCCESSFUL_NOT_NEEDED:
-            g_log ("NgpodTimer", G_LOG_LEVEL_MESSAGE, "SUCCESSFUL_NOT_NEEDED");
-        case NGPOD_WATCHER_STATUS_SUCCESSFUL:
-            g_log ("NgpodTimer", G_LOG_LEVEL_MESSAGE, "SUCCESSFUL");
-            g_timeout_add_seconds (SUCCESS_TIMEOUT, ngpod_timer_tick, data);
-            break;
-
-        default:
-            break;
+        add_timeout (self, NOT_NEEDED_TIMEOUT);
     }
+    else if (status == NGPOD_WATCHER_STATUS_UPDATED)
+    {
+        const NgpodDownloader *downloader = ngpod_watcher_get_downloader (watcher);
+        NgpodDownloaderStatus downloader_status = ngpod_downloader_get_status (downloader);
+
+        switch (downloader_status)
+        {
+            case NGPOD_DOWNLOADER_STATUS_FAILED:
+                add_timeout (self, FAILED_TIMEOUT);
+                break;
+
+            case NGPOD_DOWNLOADER_STATUS_FAILED_GET_IMAGE:
+                add_timeout (self, FAILED_TIMEOUT);
+                break;
+
+            case NGPOD_DOWNLOADER_STATUS_SUCCESS_NO_IMAGE:
+                add_timeout (self, SUCCESS_TIMEOUT);
+                break;
+
+            case NGPOD_DOWNLOADER_STATUS_SUCCESS:
+                // show window
+                // add_timeout (self, SUCCESS_TIMEOUT);
+                break;
+        }
+    }
+    else
+    {
+        // log error
+    }
+}
+
+static void
+add_timeout (NgpodTimer *self, gint seconds)
+{
+    g_timeout_add_seconds (seconds, ngpod_timer_tick, (gpointer) self);
 }

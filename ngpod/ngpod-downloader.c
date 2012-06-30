@@ -176,7 +176,7 @@ ngpod_downloader_get_data_length (NgpodDownloader *self)
 }
 
 gboolean
-ngpod_downloader_is_success (NgpodDownloader *self)
+ngpod_downloader_is_success (const NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     return priv->status == NGPOD_DOWNLOADER_STATUS_SUCCESS ||
@@ -184,7 +184,7 @@ ngpod_downloader_is_success (NgpodDownloader *self)
 }
 
 NgpodDownloaderStatus
-ngpod_downloader_get_status (NgpodDownloader *self)
+ngpod_downloader_get_status (const NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     return priv->status;

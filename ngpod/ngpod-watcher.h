@@ -18,10 +18,8 @@ typedef struct _NgpodWatcherPrivate NgpodWatcherPrivate;
 typedef enum
 {
     NGPOD_WATCHER_STATUS_INVALID,
-    NGPOD_WATCHER_STATUS_NOT_NEEDED,              // There is too early to update
-    NGPOD_WATCHER_STATUS_FAILED,                  // Failed to download website
-    NGPOD_WATCHER_STATUS_SUCCESSFUL,              // Downloading website and image succesful
-    NGPOD_WATCHER_STATUS_SUCCESSFUL_NOT_NEEDED,   // Success but image is the same as previous
+    NGPOD_WATCHER_STATUS_NOT_NEEDED,  // There is too early to update
+    NGPOD_WATCHER_STATUS_UPDATED      // Downloader was run to get new image
 } NgpodWatcherStatus;
 
 struct _NgpodWatcher
@@ -45,8 +43,9 @@ NgpodWatcher *ngpod_watcher_new (NgpodDownloader *downloader, GDate *last_date);
 /*
  * Method definitions.
  */
-NgpodWatcherStatus ngpod_watcher_tick(NgpodWatcher *self, GDateTime *now);
-NgpodWatcherStatus ngpod_watcher_get_status (NgpodWatcher *self);
+NgpodWatcherStatus ngpod_watcher_tick (NgpodWatcher *self, GDateTime *now);
+NgpodWatcherStatus ngpod_watcher_get_status (const NgpodWatcher *self);
+const NgpodDownloader *ngpod_watcher_get_downloader (const NgpodWatcher *self);
 void ngpod_watcher_set_url (NgpodWatcher *self, const gchar *url);
 
 #endif /* __NGPOD_WATCHER_H__ */
