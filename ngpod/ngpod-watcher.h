@@ -47,5 +47,6 @@ NgpodWatcherStatus ngpod_watcher_tick (NgpodWatcher *self, GDateTime *now);
 NgpodWatcherStatus ngpod_watcher_get_status (const NgpodWatcher *self);
 const NgpodDownloader *ngpod_watcher_get_downloader (const NgpodWatcher *self);
 void ngpod_watcher_set_url (NgpodWatcher *self, const gchar *url);
+const GDate *ngpod_watcher_get_last_date (const NgpodWatcher *self);
 
 #endif /* __NGPOD_WATCHER_H__ */

@@ -1,12 +1,15 @@
 #include <gtk/gtk.h>
 //#include "config_win.h"
-#include "ngpod-downloader.h"
-#include "ngpod-watcher.h"
-#include "ngpod-timer.h"
 #include <stdio.h>
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <gtk/gtk.h>
+
+#include "ngpod-downloader.h"
+#include "ngpod-watcher.h"
+#include "ngpod-timer.h"
+#include "ngpod-settings.h"
+#include "utils.h"
 
 GMainLoop *main_loop;
 NgpodDownloader *downloader;
@@ -99,9 +102,16 @@ int main (int argc, char **argv)
     // gtk_widget_show (widget);
 
     NgpodDownloader *downloader = ngpod_downloader_new ();
-    GDate *last_date = g_date_new_dmy (24, 6, 2012);
+    NgpodSettings *settings = ngpod_settings_new ();
+    ngpod_settings_initialize (settings);
+    GDate *last_date = ngpod_settings_get_last_date (settings);
+    log_message ("main", "Last date: %d-%d-%d", g_date_get_year (last_date), g_date_get_month (last_date), g_date_get_day (last_date));
     NgpodWatcher *watcher = ngpod_watcher_new (downloader, last_date);
-    NgpodTimer *timer = ngpod_timer_new (watcher);
+    NgpodTimer *timer = ngpod_timer_new (watcher, settings);
+
+    g_object_unref (downloader);
+    g_object_unref (settings);
+    g_object_unref (watcher);
 
     ngpod_timer_start (timer);
 

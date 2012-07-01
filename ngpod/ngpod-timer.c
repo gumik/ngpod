@@ -1,10 +1,12 @@
 #include "ngpod-timer.h"
+#include "utils.h"
 
 #define GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE ((obj), NGPOD_TYPE_TIMER, NgpodTimerPrivate))
 
 struct _NgpodTimerPrivate
 {
     NgpodWatcher *watcher;
+    NgpodSettings *settings;
 };
 
 G_DEFINE_TYPE (NgpodTimer, ngpod_timer, G_TYPE_OBJECT);
@@ -17,6 +19,7 @@ static const int SUCCESS_TIMEOUT = 1;
 static gboolean ngpod_timer_tick (gpointer data);
 static void watcher_finished_event (NgpodWatcher *watche, gpointer data);
 static void add_timeout (NgpodTimer *self, gint seconds);
+static void update_last_date_in_settings (NgpodTimer *self);
 
 static void
 ngpod_timer_dispose (GObject *gobject)
@@ -74,7 +77,7 @@ ngpod_timer_init (NgpodTimer *self)
 }
 
 NgpodTimer *
-ngpod_timer_new (NgpodWatcher *watcher)
+ngpod_timer_new (NgpodWatcher *watcher, NgpodSettings *settings)
 {
     GObject *object = g_object_new (NGPOD_TYPE_TIMER, NULL);
     NgpodTimerPrivate *priv = GET_PRIVATE (object);
@@ -82,6 +85,9 @@ ngpod_timer_new (NgpodWatcher *watcher)
     priv->watcher = watcher;
     g_object_ref (watcher);
     g_signal_connect (watcher, "update-finished", G_CALLBACK (watcher_finished_event), object);
+
+    priv->settings = settings;
+    g_object_ref (settings);
 
     return NGPOD_TIMER (object);
 }
@@ -115,6 +121,7 @@ watcher_finished_event (NgpodWatcher *watcher, gpointer data)
     if (status == NGPOD_WATCHER_STATUS_NOT_NEEDED)
     {
         add_timeout (self, NOT_NEEDED_TIMEOUT);
+        log_message ("Timer", "NOT_NEEDED");
     }
     else if (status == NGPOD_WATCHER_STATUS_UPDATED)
     {
@@ -124,20 +131,26 @@ watcher_finished_event (NgpodWatcher *watcher, gpointer data)
         switch (downloader_status)
         {
             case NGPOD_DOWNLOADER_STATUS_FAILED:
+                log_message ("Timer", "DOWNLOADER_FAILED");
                 add_timeout (self, FAILED_TIMEOUT);
                 break;
 
             case NGPOD_DOWNLOADER_STATUS_FAILED_GET_IMAGE:
+                log_message ("Timer", "DOWNLOADER_FAILED_GET_IMAGE");
                 add_timeout (self, FAILED_TIMEOUT);
                 break;
 
             case NGPOD_DOWNLOADER_STATUS_SUCCESS_NO_IMAGE:
+                log_message ("Timer", "DOWNLOADER_SUCCESS_NO_IMAGE");
+                update_last_date_in_settings (self);
                 add_timeout (self, SUCCESS_TIMEOUT);
                 break;
 
             case NGPOD_DOWNLOADER_STATUS_SUCCESS:
-                // show window
-                // add_timeout (self, SUCCESS_TIMEOUT);
+                log_message ("Timer", "DOWNLOADER_SUCCESS");
+                update_last_date_in_settings (self);
+                // show notification
+                add_timeout (self, SUCCESS_TIMEOUT);
                 break;
         }
     }
@@ -151,4 +164,13 @@ static void
 add_timeout (NgpodTimer *self, gint seconds)
 {
     g_timeout_add_seconds (seconds, ngpod_timer_tick, (gpointer) self);
+}
+
+static void
+update_last_date_in_settings (NgpodTimer *self)
+{
+    NgpodTimerPrivate *priv = GET_PRIVATE (self);
+
+    const GDate *last_date = ngpod_watcher_get_last_date (priv->watcher);
+    ngpod_settings_set_last_date (priv->settings, last_date);
 }

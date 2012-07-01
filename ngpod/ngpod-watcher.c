@@ -133,6 +133,13 @@ ngpod_watcher_set_url (NgpodWatcher *self, const gchar *url)
     priv->url = url;
 }
 
+const GDate *
+ngpod_watcher_get_last_date (const NgpodWatcher *self)
+{
+    NgpodWatcherPrivate *priv = GET_PRIVATE (self);
+    return priv->last_date;
+}
+
 /* private functions */
 
 static void
