@@ -162,14 +162,14 @@ ngpod_downloader_get_resolution (NgpodDownloader *self)
 }
 
 const char*
-ngpod_downloader_get_data (NgpodDownloader *self)
+ngpod_downloader_get_data (const NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     return priv->data;
 }
 
 gsize
-ngpod_downloader_get_data_length (NgpodDownloader *self)
+ngpod_downloader_get_data_length (const NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     return priv->data_length;

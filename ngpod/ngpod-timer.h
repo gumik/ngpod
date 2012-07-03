@@ -4,6 +4,7 @@
 #include <glib-object.h>
 #include "ngpod-watcher.h"
 #include "ngpod-settings.h"
+#include "ngpod-presenter.h"
 
 #define NGPOD_TYPE_TIMER                  (ngpod_timer_get_type ())
 #define NGPOD_TIMER(obj)                  (G_TYPE_CHECK_INSTANCE_CAST ((obj), NGPOD_TYPE_TIMER, NgpodTimer))
@@ -30,7 +31,10 @@ struct _NgpodTimerClass
 /* used by NGPOD_TYPE_TIMER */
 GType ngpod_timer_get_type (void);
 
-NgpodTimer *ngpod_timer_new (NgpodWatcher *watcher, NgpodSettings *settings);
+NgpodTimer *ngpod_timer_new (
+	NgpodWatcher *watcher,
+	NgpodSettings *settings,
+	NgpodPresenter *presenter);
 
 /*
  * Method definitions.

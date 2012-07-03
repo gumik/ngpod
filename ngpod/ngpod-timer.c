@@ -7,6 +7,7 @@ struct _NgpodTimerPrivate
 {
     NgpodWatcher *watcher;
     NgpodSettings *settings;
+    NgpodPresenter *presenter;
 };
 
 G_DEFINE_TYPE (NgpodTimer, ngpod_timer, G_TYPE_OBJECT);
@@ -77,7 +78,10 @@ ngpod_timer_init (NgpodTimer *self)
 }
 
 NgpodTimer *
-ngpod_timer_new (NgpodWatcher *watcher, NgpodSettings *settings)
+ngpod_timer_new (
+    NgpodWatcher *watcher,
+    NgpodSettings *settings,
+    NgpodPresenter *presenter)
 {
     GObject *object = g_object_new (NGPOD_TYPE_TIMER, NULL);
     NgpodTimerPrivate *priv = GET_PRIVATE (object);
@@ -88,6 +92,9 @@ ngpod_timer_new (NgpodWatcher *watcher, NgpodSettings *settings)
 
     priv->settings = settings;
     g_object_ref (settings);
+
+    priv->presenter = presenter;
+    g_object_ref (presenter);
 
     return NGPOD_TIMER (object);
 }
@@ -116,6 +123,7 @@ static void
 watcher_finished_event (NgpodWatcher *watcher, gpointer data)
 {
     NgpodTimer *self = (NgpodTimer *) data;
+    NgpodTimerPrivate *priv = GET_PRIVATE (self);
     NgpodWatcherStatus status = ngpod_watcher_get_status (watcher);
 
     if (status == NGPOD_WATCHER_STATUS_NOT_NEEDED)
@@ -149,7 +157,12 @@ watcher_finished_event (NgpodWatcher *watcher, gpointer data)
             case NGPOD_DOWNLOADER_STATUS_SUCCESS:
                 log_message ("Timer", "DOWNLOADER_SUCCESS");
                 update_last_date_in_settings (self);
-                // show notification
+
+                ngpod_presenter_notify (
+                    priv->presenter,
+                    ngpod_downloader_get_data (downloader),
+                    ngpod_downloader_get_data_length (downloader));
+
                 add_timeout (self, SUCCESS_TIMEOUT);
                 break;
         }
