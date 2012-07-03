@@ -9,6 +9,7 @@
 #include "ngpod-watcher.h"
 #include "ngpod-timer.h"
 #include "ngpod-settings.h"
+#include "ngpod-presenter.h"
 #include "utils.h"
 
 GMainLoop *main_loop;
@@ -93,27 +94,37 @@ int main (int argc, char **argv)
 
     g_log_set_default_handler (log_func, NULL);
 
-    // GtkBuilder *builder = gtk_builder_new ();
-    // gtk_builder_add_from_file (builder, "gui.glade", NULL);
+    // NgpodDownloader *downloader = ngpod_downloader_new ();
+    // NgpodSettings *settings = ngpod_settings_new ();
+    // ngpod_settings_initialize (settings);
+    // GDate *last_date = ngpod_settings_get_last_date (settings);
+    // log_message ("main", "Last date: %d-%d-%d", g_date_get_year (last_date), g_date_get_month (last_date), g_date_get_day (last_date));
+    // NgpodWatcher *watcher = ngpod_watcher_new (downloader, last_date);
+    // NgpodTimer *timer = ngpod_timer_new (watcher, settings);
 
-    // GtkWidget *widget = GTK_WIDGET (gtk_builder_get_object (builder, "picture-dialog"));
-    // gtk_builder_connect_signals (builder, NULL);
-    // g_object_unref (builder);
-    // gtk_widget_show (widget);
+    // g_object_unref (downloader);
+    // g_object_unref (settings);
+    // g_object_unref (watcher);
 
-    NgpodDownloader *downloader = ngpod_downloader_new ();
-    NgpodSettings *settings = ngpod_settings_new ();
-    ngpod_settings_initialize (settings);
-    GDate *last_date = ngpod_settings_get_last_date (settings);
-    log_message ("main", "Last date: %d-%d-%d", g_date_get_year (last_date), g_date_get_month (last_date), g_date_get_day (last_date));
-    NgpodWatcher *watcher = ngpod_watcher_new (downloader, last_date);
-    NgpodTimer *timer = ngpod_timer_new (watcher, settings);
+    // ngpod_timer_start (timer);
 
-    g_object_unref (downloader);
-    g_object_unref (settings);
-    g_object_unref (watcher);
+    NgpodPresenter *presenter = ngpod_presenter_new ();
 
-    ngpod_timer_start (timer);
+    GFile *file = g_file_new_for_path ("/home/gumik/temp/temp.jpg");
+    GError *error = NULL;
+    GFileInputStream *stream = g_file_read (file, NULL, &error);
+
+    if (error != NULL)
+    {
+        g_print ("%s\n", error->message);
+        g_error_free (error);
+    }
+
+    const char *data = g_malloc (10 * 1024 * 1024);
+    gsize length = g_input_stream_read (G_INPUT_STREAM (stream), (gpointer) data, 10 * 1024 * 1024, NULL, NULL);
+    g_print ("data length: %ld\n", length);
+
+    ngpod_presenter_notify (presenter, data, length);
 
     gtk_main ();
 }
