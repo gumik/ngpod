@@ -126,10 +126,17 @@ ngpod_presenter_show_window (NgpodPresenter *self)
 
         GInputStream *stream = g_memory_input_stream_new_from_data (priv->data, priv->data_length, NULL);
         GdkPixbuf *pixbuf = gdk_pixbuf_new_from_stream (stream, NULL, NULL);
-        gtk_image_set_from_pixbuf (image, pixbuf);
+        int width = gdk_pixbuf_get_width (pixbuf);
+        int height = gdk_pixbuf_get_height (pixbuf);
+        gdouble factor = (gdouble) width / height;
+        int dest_width = 640;
+        int dest_height = (int) (640 / factor);
+        GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, dest_width, dest_height, GDK_INTERP_HYPER);
+        gtk_image_set_from_pixbuf (image, scaled_pixbuf);
 
         g_clear_object (&stream);
         g_clear_object (&pixbuf);
+        g_clear_object (&scaled_pixbuf);
     }
 
     gtk_widget_set_visible (priv->window, TRUE);
