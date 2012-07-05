@@ -21,6 +21,7 @@ static gboolean ngpod_timer_tick (gpointer data);
 static void watcher_finished_event (NgpodWatcher *watche, gpointer data);
 static void add_timeout (NgpodTimer *self, gint seconds);
 static void update_last_date_in_settings (NgpodTimer *self);
+static void presenter_made_choice_event (NgpodPresenter *presenter, gpointer data);
 
 static void
 ngpod_timer_dispose (GObject *gobject)
@@ -95,6 +96,7 @@ ngpod_timer_new (
 
     priv->presenter = presenter;
     g_object_ref (presenter);
+    g_signal_connect (presenter, "made-choice", G_CALLBACK (presenter_made_choice_event), object);
 
     return NGPOD_TIMER (object);
 }
@@ -162,8 +164,6 @@ watcher_finished_event (NgpodWatcher *watcher, gpointer data)
                     priv->presenter,
                     ngpod_downloader_get_data (downloader),
                     ngpod_downloader_get_data_length (downloader));
-
-                add_timeout (self, SUCCESS_TIMEOUT);
                 break;
         }
     }
@@ -186,4 +186,19 @@ update_last_date_in_settings (NgpodTimer *self)
 
     const GDate *last_date = ngpod_watcher_get_last_date (priv->watcher);
     ngpod_settings_set_last_date (priv->settings, last_date);
+}
+
+static void
+presenter_made_choice_event (NgpodPresenter *presenter, gpointer data)
+{
+    NgpodTimer *self = (NgpodTimer *) data;
+    NgpodTimerPrivate *priv = GET_PRIVATE (self);
+
+    if (ngpod_presenter_is_accepted (presenter))
+    {
+        g_print ("SET IMAGE\n");
+    }
+
+    ngpod_presenter_hide (presenter);
+    add_timeout (self, SUCCESS_TIMEOUT);
 }
