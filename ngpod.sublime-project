@@ -26,7 +26,9 @@
 			"-I/usr/include/libsoup-2.4",
 			"-I/usr/include/libxml2",
 			"-I/usr/include/glib-2.0",
-			"-I/usr/lib/x86_64-linux-gnu/glib-2.0/include"
+			"-I/usr/lib/x86_64-linux-gnu/glib-2.0/include",
+
+			"-I/usr/include/mateconf/2"
 		]
 	}
 }

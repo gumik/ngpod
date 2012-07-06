@@ -125,6 +125,23 @@ ngpod_presenter_hide (NgpodPresenter *self)
     ngpod_presenter_hide_tray (self);
 }
 
+void
+ngpod_presenter_show_error (NgpodPresenter *self, const gchar *msg)
+{
+    NgpodPresenterPrivate *priv = GET_PRIVATE (self);
+    GtkWindow *parent = priv->window != NULL ? GTK_WINDOW (priv->window) : NULL;
+
+    GtkWidget *dialog = gtk_message_dialog_new (
+        parent,
+        GTK_DIALOG_DESTROY_WITH_PARENT,
+        GTK_MESSAGE_ERROR,
+        GTK_BUTTONS_CLOSE,
+        "%s", msg);
+
+    gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
+}
+
 gboolean
 ngpod_presenter_is_accepted (NgpodPresenter *self)
 {

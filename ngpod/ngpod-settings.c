@@ -135,6 +135,22 @@ ngpod_settings_get_last_date (NgpodSettings *self)
     return date;
 }
 
+void
+ngpod_settings_set_dir (NgpodSettings *self, const gchar *dir)
+{
+    NgpodSettingsPrivate *priv = GET_PRIVATE (self);
+
+    g_key_file_set_string (priv->key_file, "main", "dir", dir);
+    save_settings (self);
+}
+
+gchar *
+ngpod_settings_get_dir (const NgpodSettings *self)
+{
+    NgpodSettingsPrivate *priv = GET_PRIVATE (self);
+    return g_key_file_get_string (priv->key_file, "main", "dir", NULL);
+}
+
 /* private functions */
 
 static gboolean

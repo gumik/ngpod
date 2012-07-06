@@ -35,6 +35,7 @@ NgpodPresenter *ngpod_presenter_new (void);
  */
 void ngpod_presenter_notify (NgpodPresenter *self, const char *data, const gsize data_length);
 void ngpod_presenter_hide (NgpodPresenter *self);
+void ngpod_presenter_show_error (NgpodPresenter *self, const gchar *msg);
 gboolean ngpod_presenter_is_accepted (NgpodPresenter *self);
 
 #endif /* __NGPOD_PRESENTER_H__ */

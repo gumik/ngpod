@@ -34,7 +34,11 @@ NgpodSettings *ngpod_settings_new (void);
  * Method definitions.
  */
 gboolean ngpod_settings_initialize (NgpodSettings *self);
+
 void ngpod_settings_set_last_date (NgpodSettings *self, const GDate *date);
 GDate *ngpod_settings_get_last_date (NgpodSettings *self);
+
+void ngpod_settings_set_dir (NgpodSettings *self, const gchar *dir);
+gchar *ngpod_settings_get_dir (const NgpodSettings *self);
 
 #endif /* __NGPOD_SETTINGS_H__ */

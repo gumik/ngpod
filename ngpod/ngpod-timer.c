@@ -8,14 +8,15 @@ struct _NgpodTimerPrivate
     NgpodWatcher *watcher;
     NgpodSettings *settings;
     NgpodPresenter *presenter;
+    NgpodWallpaper *wallpaper;
 };
 
 G_DEFINE_TYPE (NgpodTimer, ngpod_timer, G_TYPE_OBJECT);
 
-static const int NOT_NEEDED_TIMEOUT = 1;
-static const int FAILED_TIMEOUT = 1;
-static const int SUCCESS_TIMEOUT = 1;
-//static const int SUCCESS_NOT_NEED_TIMEOUT = 1;
+static const int NOT_NEEDED_TIMEOUT = 60;
+static const int FAILED_TIMEOUT = 60;
+static const int SUCCESS_TIMEOUT = 5 * 60;
+static const int SUCCESS_NO_IMAGE_TIMEOUT = 15 * 60;
 
 static gboolean ngpod_timer_tick (gpointer data);
 static void watcher_finished_event (NgpodWatcher *watche, gpointer data);
@@ -55,6 +56,9 @@ ngpod_timer_finalize (GObject *gobject)
     NgpodTimerPrivate *priv = GET_PRIVATE (self);
 
     g_clear_object (&priv->watcher);
+    g_clear_object (&priv->settings);
+    g_clear_object (&priv->presenter);
+    g_clear_object (&priv->wallpaper);
 
     /* Chain up to the parent class */
     G_OBJECT_CLASS (ngpod_timer_parent_class)->finalize (gobject);
@@ -82,7 +86,8 @@ NgpodTimer *
 ngpod_timer_new (
     NgpodWatcher *watcher,
     NgpodSettings *settings,
-    NgpodPresenter *presenter)
+    NgpodPresenter *presenter,
+    NgpodWallpaper *wallpaper)
 {
     GObject *object = g_object_new (NGPOD_TYPE_TIMER, NULL);
     NgpodTimerPrivate *priv = GET_PRIVATE (object);
@@ -97,6 +102,9 @@ ngpod_timer_new (
     priv->presenter = presenter;
     g_object_ref (presenter);
     g_signal_connect (presenter, "made-choice", G_CALLBACK (presenter_made_choice_event), object);
+
+    priv->wallpaper = wallpaper;
+    g_object_ref (wallpaper);
 
     return NGPOD_TIMER (object);
 }
@@ -153,7 +161,7 @@ watcher_finished_event (NgpodWatcher *watcher, gpointer data)
             case NGPOD_DOWNLOADER_STATUS_SUCCESS_NO_IMAGE:
                 log_message ("Timer", "DOWNLOADER_SUCCESS_NO_IMAGE");
                 update_last_date_in_settings (self);
-                add_timeout (self, SUCCESS_TIMEOUT);
+                add_timeout (self, SUCCESS_NO_IMAGE_TIMEOUT);
                 break;
 
             case NGPOD_DOWNLOADER_STATUS_SUCCESS:
@@ -169,7 +177,7 @@ watcher_finished_event (NgpodWatcher *watcher, gpointer data)
     }
     else
     {
-        // log error
+        log_message ("Timer", "unknown NgpodWatcher status");
     }
 }
 
@@ -196,7 +204,20 @@ presenter_made_choice_event (NgpodPresenter *presenter, gpointer data)
 
     if (ngpod_presenter_is_accepted (presenter))
     {
-        g_print ("SET IMAGE\n");
+        GError *error = NULL;
+
+        const NgpodDownloader *downloader = ngpod_watcher_get_downloader (priv->watcher);
+        const char * data = ngpod_downloader_get_data (downloader);
+        gsize data_length = ngpod_downloader_get_data_length (downloader);
+
+        if (!ngpod_wallpaper_set_from_data(priv->wallpaper, data, data_length, &error))
+        {
+            GString *msg = g_string_new ("");
+            g_string_printf (msg, "Error while setting wallpaper:\n%s", error->message);
+            ngpod_presenter_show_error (priv->presenter, msg->str);
+            log_message ("Timer", msg->str);
+            g_string_free (msg, TRUE);
+        }
     }
 
     ngpod_presenter_hide (presenter);

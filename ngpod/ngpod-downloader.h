@@ -46,8 +46,8 @@ const gchar *NGPOD_DOWNLOADER_DEFAULT_URL;
  * Method definitions.
  */
 void ngpod_downloader_start (NgpodDownloader *self, const gchar *url);
-const GDate* ngpod_downloader_get_date (NgpodDownloader *self);
-const gchar* ngpod_downloader_get_link (NgpodDownloader *self);
+const GDate* ngpod_downloader_get_date (const NgpodDownloader *self);
+const gchar* ngpod_downloader_get_link (const NgpodDownloader *self);
 const gchar* ngpod_downloader_get_resolution (NgpodDownloader *self);
 const char* ngpod_downloader_get_data (const NgpodDownloader *self);
 gsize ngpod_downloader_get_data_length (const NgpodDownloader *self);

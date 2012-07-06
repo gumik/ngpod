@@ -137,18 +137,20 @@ ngpod_downloader_start (NgpodDownloader *self, const gchar *url)
     SoupSession *soup_session = priv->session;
     SoupMessage *msg = soup_message_new("GET", url);
 
+    log_message ("Downloader", "start: %s", url);
+
     soup_session_queue_message (soup_session, msg, site_download_callback, self);
 }
 
 const GDate*
-ngpod_downloader_get_date (NgpodDownloader *self)
+ngpod_downloader_get_date (const NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     return priv->date;
 }
 
 const gchar*
-ngpod_downloader_get_link (NgpodDownloader *self)
+ngpod_downloader_get_link (const NgpodDownloader *self)
 {
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     return priv->link;
@@ -251,6 +253,8 @@ download_image (NgpodDownloader *self)
     SoupSession *soup_session = priv->session;
     SoupMessage *msg = soup_message_new("GET", priv->link);
 
+    log_message ("Downloader", "download_image: %s", priv->link);
+
     soup_session_queue_message (soup_session, msg, image_download_callback, self);
 }
 
@@ -284,6 +288,7 @@ image_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_d
 static void
 emit_download_finished (NgpodDownloader *self)
 {
+    log_message ("Downloader", "download_finished: %d", self->priv->status);
     g_signal_emit (self, signals[DOWNLOAD_FINISHED], 0);
 }
 
