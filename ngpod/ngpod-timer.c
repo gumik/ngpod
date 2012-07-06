@@ -217,6 +217,7 @@ presenter_made_choice_event (NgpodPresenter *presenter, gpointer data)
             ngpod_presenter_show_error (priv->presenter, msg->str);
             log_message ("Timer", msg->str);
             g_string_free (msg, TRUE);
+            g_error_free (error);
         }
     }
 

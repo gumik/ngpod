@@ -4,6 +4,7 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <gtk/gtk.h>
+#include <gio/gio.h>
 
 #include "ngpod-downloader.h"
 #include "ngpod-watcher.h"
@@ -15,13 +16,62 @@
 GMainLoop *main_loop;
 NgpodDownloader *downloader;
 
+static gchar *log_file = NULL;
+static GFileOutputStream *os = NULL;
+
+static void log_to_file (const gchar *msg, gsize length)
+{
+    if (log_file != NULL)
+    {
+        GError *error = NULL;
+
+        if (os == NULL)
+        {
+            GFile *file = g_file_new_for_path (log_file);
+            os = g_file_append_to (file, G_FILE_CREATE_NONE, NULL, &error);
+
+            if (os == NULL)
+            {
+                g_print ("Cannot open log file: %s\n", error->message);
+                g_error_free (error);
+                g_object_unref (file);
+                return;
+            }
+
+            g_object_unref (file);
+        }
+
+        gsize bytes_written = 0;
+        if (!g_output_stream_write_all (G_OUTPUT_STREAM (os), msg, length, &bytes_written, NULL, &error))
+        {
+            g_print ("Cannot write to log file: %s\n", error->message);
+            g_error_free (error);
+            return;
+        }
+
+        if (!g_output_stream_flush (G_OUTPUT_STREAM (os), NULL, &error))
+        {
+            g_print ("Cannot flush log file: %s\n", error->message);
+            g_error_free (error);
+            return;
+        }
+    }
+}
+
 static void
 log_func (const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
 {
     GDateTime *now = g_date_time_new_now_local ();
     gchar *time_str = g_date_time_format (now, "%Y-%m-%d %H:%M:%S");
-    g_print ("[%s] %s-%d: %s\n", time_str, log_domain, log_level, message);
+    GString *msg = g_string_new ("");
+
+    g_string_printf (msg, "[%s] %s-%d: %s\n", time_str, log_domain, log_level, message);
+    g_print ("%s", msg->str);
+
+    log_to_file (msg->str, msg->len);
+
     g_free (time_str);
+    g_string_free (msg, TRUE);
 }
 
 int main (int argc, char **argv)
@@ -32,6 +82,12 @@ int main (int argc, char **argv)
 
     NgpodSettings *settings = ngpod_settings_new ();
     ngpod_settings_initialize (settings);
+
+    log_file = ngpod_settings_get_log_file (settings);
+    if (log_file != NULL)
+    {
+        log_message ("main", "Log file: %s", log_file);
+    }
 
     GDate *last_date = ngpod_settings_get_last_date (settings);
     log_message ("main", "Last date: %d-%d-%d", g_date_get_year (last_date), g_date_get_month (last_date), g_date_get_day (last_date));

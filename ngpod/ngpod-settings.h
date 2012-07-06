@@ -41,4 +41,6 @@ GDate *ngpod_settings_get_last_date (NgpodSettings *self);
 void ngpod_settings_set_dir (NgpodSettings *self, const gchar *dir);
 gchar *ngpod_settings_get_dir (const NgpodSettings *self);
 
+gchar *ngpod_settings_get_log_file (NgpodSettings *self);
+
 #endif /* __NGPOD_SETTINGS_H__ */

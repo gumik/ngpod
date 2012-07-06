@@ -151,6 +151,13 @@ ngpod_settings_get_dir (const NgpodSettings *self)
     return g_key_file_get_string (priv->key_file, "main", "dir", NULL);
 }
 
+gchar *
+ngpod_settings_get_log_file (NgpodSettings *self)
+{
+    NgpodSettingsPrivate *priv = GET_PRIVATE (self);
+    return g_key_file_get_string (priv->key_file, "main", "log_file", NULL);
+}
+
 /* private functions */
 
 static gboolean
