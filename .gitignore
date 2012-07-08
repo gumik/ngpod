@@ -7,3 +7,6 @@ ngpod/CMakeFiles/
 ngpod/CMakeCache.txt
 ngpod/Makefile
 ngpod/cmake_install.cmake
+ngpod/ngpod
+ngpod/resources.c
+
