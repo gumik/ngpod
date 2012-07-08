@@ -166,7 +166,6 @@ watcher_finished_event (NgpodWatcher *watcher, gpointer data)
 
             case NGPOD_DOWNLOADER_STATUS_SUCCESS:
                 log_message ("Timer", "DOWNLOADER_SUCCESS");
-                update_last_date_in_settings (self);
 
                 ngpod_presenter_notify (
                     priv->presenter,
@@ -222,5 +221,6 @@ presenter_made_choice_event (NgpodPresenter *presenter, gpointer data)
     }
 
     ngpod_presenter_hide (presenter);
+    update_last_date_in_settings (self);
     add_timeout (self, SUCCESS_TIMEOUT);
 }
