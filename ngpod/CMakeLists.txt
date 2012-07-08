@@ -7,8 +7,8 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 
 configure_file (
-  "${PROJECT_SOURCE_DIR}/ngpod-config.h.in"
-  "${PROJECT_BINARY_DIR}/ngpod-config.h"
+  "${PROJECT_SOURCE_DIR}/config.h.in"
+  "${PROJECT_BINARY_DIR}/config.h"
   )
 
  include_directories("${PROJECT_BINARY_DIR}")

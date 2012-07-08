@@ -1,5 +1,4 @@
 #include <gtk/gtk.h>
-//#include "config_win.h"
 #include <stdio.h>
 #include <glib.h>
 #include <glib/gprintf.h>
@@ -11,6 +10,7 @@
 #include "ngpod-timer.h"
 #include "ngpod-settings.h"
 #include "ngpod-presenter.h"
+#include "config.h"
 #include "utils.h"
 
 GMainLoop *main_loop;
@@ -76,6 +76,9 @@ log_func (const gchar *log_domain, GLogLevelFlags log_level, const gchar *messag
 
 int main (int argc, char **argv)
 {
+    g_print ("ngpod %d.%d - National Geographic Picture of the Day wallpaper downloader\n",
+        VERSION_MAJOR, VERSION_MINOR);
+
     gtk_init (&argc, &argv);
 
     g_log_set_default_handler (log_func, NULL);
