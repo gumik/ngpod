@@ -158,6 +158,29 @@ ngpod_settings_get_log_file (NgpodSettings *self)
     return g_key_file_get_string (priv->key_file, "main", "log_file", NULL);
 }
 
+GTimeSpan
+ngpod_settings_get_time_span (NgpodSettings *self)
+{
+    NgpodSettingsPrivate *priv = GET_PRIVATE (self);
+
+    gsize length = 0;
+    gint *list = g_key_file_get_integer_list (priv->key_file, "main", "time_span", &length, NULL);
+
+    GTimeSpan time_span = 0;
+
+    if (list != NULL && length == 2)
+    {
+        if (length == 2)
+        {
+            time_span = G_TIME_SPAN_HOUR * list[0] + G_TIME_SPAN_MINUTE * list[1];
+        }
+
+        g_free (list);
+    }
+
+    return time_span;
+}
+
 /* private functions */
 
 static gboolean

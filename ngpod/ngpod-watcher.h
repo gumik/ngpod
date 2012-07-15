@@ -38,7 +38,7 @@ GType ngpod_watcher_get_type (void);
 
 /* Creates new instance of watcher.
  * watcher takes responsibility of freeing last_date */
-NgpodWatcher *ngpod_watcher_new (NgpodDownloader *downloader, GDate *last_date);
+NgpodWatcher *ngpod_watcher_new (NgpodDownloader *downloader, GDate *last_date, GTimeSpan time_span);
 
 /*
  * Method definitions.

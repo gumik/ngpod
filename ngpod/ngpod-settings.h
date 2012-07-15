@@ -43,4 +43,6 @@ gchar *ngpod_settings_get_dir (const NgpodSettings *self);
 
 gchar *ngpod_settings_get_log_file (NgpodSettings *self);
 
+GTimeSpan ngpod_settings_get_time_span (NgpodSettings *self);
+
 #endif /* __NGPOD_SETTINGS_H__ */

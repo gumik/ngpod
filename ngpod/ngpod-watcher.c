@@ -13,6 +13,7 @@ struct _NgpodWatcherPrivate
 {
     NgpodDownloader *downloader;
     GDate *last_date;
+    GTimeSpan time_span;
     NgpodWatcherStatus status;
     const gchar *url;
 };
@@ -76,13 +77,14 @@ ngpod_watcher_init (NgpodWatcher *self)
 }
 
 NgpodWatcher *
-ngpod_watcher_new (NgpodDownloader *downloader, GDate *last_date)
+ngpod_watcher_new (NgpodDownloader *downloader, GDate *last_date, GTimeSpan time_span)
 {
     GObject *object = g_object_new (NGPOD_TYPE_WATCHER, NULL);
     NgpodWatcherPrivate *priv = GET_PRIVATE (object);
 
     priv->downloader = downloader;
     priv->last_date = last_date;
+    priv->time_span = time_span;
 
     g_object_ref (priv->downloader);
 
@@ -185,7 +187,7 @@ is_download_needed(NgpodWatcher *self, GDateTime *now)
     gint last_day = g_date_get_day (last_date);
 
     GDateTime *last_date_time = g_date_time_new_local (last_year, last_month, last_day, 0, 0, 0);
-    GDateTime *last_date_time_added = g_date_time_add_days (last_date_time, 1);
+    GDateTime *last_date_time_added = g_date_time_add (last_date_time, G_TIME_SPAN_DAY + priv->time_span);
 
     GTimeSpan diff = g_date_time_difference (last_date_time_added, now);
 

@@ -103,8 +103,11 @@ int main (int argc, char **argv)
     }
     log_message ("main", "Dir: %s", dir);
 
+    GTimeSpan time_span = ngpod_settings_get_time_span (settings);
+    log_message ("main", "Time span: %dh %dmin", time_span / G_TIME_SPAN_HOUR, (time_span % G_TIME_SPAN_HOUR) / G_TIME_SPAN_MINUTE);
+
     NgpodDownloader *downloader = ngpod_downloader_new ();
-    NgpodWatcher *watcher = ngpod_watcher_new (downloader, last_date);
+    NgpodWatcher *watcher = ngpod_watcher_new (downloader, last_date, time_span);
     NgpodPresenter *presenter = ngpod_presenter_new ();
     NgpodWallpaper *wallpaper = ngpod_wallpaper_new (dir);
     NgpodTimer *timer = ngpod_timer_new (watcher, settings, presenter, wallpaper);
