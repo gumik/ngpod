@@ -1,5 +1,5 @@
 #include <gio/gio.h>
-#include <mateconf/mateconf.h>
+#include <gconf/gconf.h>
 #include "ngpod-wallpaper.h"
 
 #define GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE ((obj), NGPOD_TYPE_WALLPAPER, NgpodWallpaperPrivate))
@@ -120,17 +120,17 @@ ngpod_wallpaper_set_from_data (NgpodWallpaper *self, const char *data, gsize dat
     g_object_unref (stream);
 
     // Change desktop background
-    MateConfEngine *conf = mateconf_engine_get_default ();
-    gchar *value = mateconf_engine_get_string (conf, "/desktop/mate/background/picture_filename", NULL);
-    if (!mateconf_engine_set_string (conf, "/desktop/mate/background/picture_filename", path, error))
+    GConfEngine *conf = gconf_engine_get_default ();
+    gchar *value = gconf_engine_get_string (conf, "/desktop/gnome/background/picture_filename", NULL);
+    if (!gconf_engine_set_string (conf, "/desktop/gnome/background/picture_filename", path, error))
     {
         g_free (path);
-        mateconf_engine_unref (conf);
+        gconf_engine_unref (conf);
         return FALSE;
     }
 
     g_free (path);
-    mateconf_engine_unref (conf);
+    gconf_engine_unref (conf);
 
     return TRUE;
 }

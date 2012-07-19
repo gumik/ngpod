@@ -25,16 +25,16 @@ include_directories (${LIBSOUP_INCLUDE_DIRS})
 link_directories (${LIBSOUP_LIBRARY_DIRS})
 add_definitions (${LIBSOUP_CFLAGS_OTHER})
 
-pkg_check_modules (MATECONF2 REQUIRED mateconf-2.0)
-include_directories (${MATECONF2_INCLUDE_DIRS})
-link_directories (${MATECONF2_LIBRARY_DIRS})
-add_definitions (${MATECONF2_CFLAGS_OTHER})
+pkg_check_modules (GCONF2 REQUIRED gconf-2.0)
+include_directories (${GCONF2_INCLUDE_DIRS})
+link_directories (${GCONF2_LIBRARY_DIRS})
+add_definitions (${GCONF2_CFLAGS_OTHER})
 
-add_custom_command (OUTPUT resources.c
-                    COMMAND glib-compile-resources --generate-source resources.xml
-                    DEPENDS resources.xml)
+#add_custom_command (OUTPUT resources.c
+#                    COMMAND glib-compile-resources --generate-source resources.xml
+#                    DEPENDS resources.xml)
 
 aux_source_directory (${PROJECT_SOURCE_DIR} SOURCES)
-add_executable(ngpod ${SOURCES} resources.c)
+add_executable(ngpod ${SOURCES})
 
-target_link_libraries (ngpod ${GTK2_LIBRARIES} ${LIBSOUP_LIBRARIES} ${MATECONF2_LIBRARIES})
+target_link_libraries (ngpod ${GTK2_LIBRARIES} ${LIBSOUP_LIBRARIES} ${GCONF2_LIBRARIES})

@@ -158,12 +158,8 @@ ngpod_presenter_show_window (NgpodPresenter *self)
 
     if (priv->window == NULL)
     {
-        GBytes *gui_bytes = g_resources_lookup_data ("/gumik/ngpod/gui.glade", G_RESOURCE_LOOKUP_FLAGS_NONE, NULL);
-        gsize data_length = 0;
-        gconstpointer data = g_bytes_get_data (gui_bytes, &data_length);
         GtkBuilder *builder = gtk_builder_new ();
-        gtk_builder_add_from_string (builder, data, data_length, NULL);
-        g_bytes_unref (gui_bytes);
+        gtk_builder_add_from_file (builder, "/home/km/temp/ngpod/ngpod/gui.glade", NULL);
 
         priv->window = GTK_WIDGET (gtk_builder_get_object (builder, "picture-dialog"));
         gtk_builder_connect_signals (builder, NULL);
@@ -221,14 +217,12 @@ ngpod_presenter_show_tray (NgpodPresenter *self)
     if (priv->icon == NULL)
     {
         priv->icon = gtk_status_icon_new ();
-        GInputStream *stream = g_resources_open_stream ("/gumik/ngpod/NG_Yellow_Frame.png", G_RESOURCE_LOOKUP_FLAGS_NONE, NULL);
-        GdkPixbuf *pixbuf = gdk_pixbuf_new_from_stream (stream, NULL, NULL);
+        GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file ("/home/km/temp/ngpod/ngpod/NG_Yellow_Frame.png", NULL);
 
         gtk_status_icon_set_from_pixbuf (priv->icon, pixbuf);
         g_signal_connect (priv->icon, "activate", G_CALLBACK (status_icon_activate), self);
 
         g_object_unref (pixbuf);
-        g_object_unref (stream);
     }
 
     gtk_status_icon_set_visible(priv->icon, TRUE);
