@@ -10,6 +10,7 @@ Dependencies
 * glib >= 2.32
 * gtk+ 2
 * libsoup 2
+* libxml 2
 * mateconf 2
 
 Installation
@@ -25,9 +26,9 @@ This is standard .ini like file. It should contain one section `[main]`.
 Possible options are:
 
 * dir - path to directory where to put downloaded pictures; *required*
-* time_span - time from midnight when new picture is expected; *optional*
-* log_file - path to log file; *optional*
-* last_date - date when the last picture was downloaded;
+* time\_span - time from midnight when new picture is expected; *optional*
+* log\_file - path to log file; *optional*
+* last\_date - date when the last picture was downloaded;
     it is set by the program every time new picture appears;
     normally you don't want to use it
 

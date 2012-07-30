@@ -30,6 +30,11 @@ include_directories (${MATECONF2_INCLUDE_DIRS})
 link_directories (${MATECONF2_LIBRARY_DIRS})
 add_definitions (${MATECONF2_CFLAGS_OTHER})
 
+pkg_check_modules (LIBXML2 REQUIRED libxml-2.0)
+include_directories (${LIBXML2_INCLUDE_DIRS})
+link_directories (${LIBXML2_LIBRARY_DIRS})
+add_definitions (${LIBXML2_CFLAGS_OTHER})
+
 add_custom_command (OUTPUT resources.c
                     COMMAND glib-compile-resources --generate-source resources.xml
                     DEPENDS resources.xml)
@@ -37,4 +42,4 @@ add_custom_command (OUTPUT resources.c
 aux_source_directory (${PROJECT_SOURCE_DIR} SOURCES)
 add_executable(ngpod ${SOURCES} resources.c)
 
-target_link_libraries (ngpod ${GTK2_LIBRARIES} ${LIBSOUP_LIBRARIES} ${MATECONF2_LIBRARIES})
+target_link_libraries (ngpod ${GTK2_LIBRARIES} ${LIBSOUP_LIBRARIES} ${MATECONF2_LIBRARIES} ${LIBXML2_LIBRARIES})

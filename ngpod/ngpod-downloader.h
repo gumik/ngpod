@@ -51,6 +51,8 @@ const gchar* ngpod_downloader_get_link (const NgpodDownloader *self);
 const gchar* ngpod_downloader_get_resolution (NgpodDownloader *self);
 const char* ngpod_downloader_get_data (const NgpodDownloader *self);
 gsize ngpod_downloader_get_data_length (const NgpodDownloader *self);
+const gchar *ngpod_downloader_get_title (const NgpodDownloader *self);
+const gchar *ngpod_downloader_get_description (const NgpodDownloader *self);
 gboolean ngpod_downloader_is_success (const NgpodDownloader *self);
 NgpodDownloaderStatus ngpod_downloader_get_status (const NgpodDownloader *self);
 
