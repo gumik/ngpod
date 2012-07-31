@@ -30,11 +30,12 @@ include_directories (${GCONF2_INCLUDE_DIRS})
 link_directories (${GCONF2_LIBRARY_DIRS})
 add_definitions (${GCONF2_CFLAGS_OTHER})
 
-#add_custom_command (OUTPUT resources.c
-#                    COMMAND glib-compile-resources --generate-source resources.xml
-#                    DEPENDS resources.xml)
+pkg_check_modules (LIBXML2 REQUIRED libxml-2.0)
+include_directories (${LIBXML2_INCLUDE_DIRS})
+link_directories (${LIBXML2_LIBRARY_DIRS})
+add_definitions (${LIBXML2_CFLAGS_OTHER})
 
 aux_source_directory (${PROJECT_SOURCE_DIR} SOURCES)
 add_executable(ngpod ${SOURCES})
 
-target_link_libraries (ngpod ${GTK2_LIBRARIES} ${LIBSOUP_LIBRARIES} ${GCONF2_LIBRARIES})
+target_link_libraries (ngpod ${GTK2_LIBRARIES} ${LIBSOUP_LIBRARIES} ${GCONF2_LIBRARIES} ${LIBXML2_LIBRARIES})

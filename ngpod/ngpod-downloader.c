@@ -1,6 +1,9 @@
 #include "ngpod-downloader.h"
 #include "utils.h"
 #include <libsoup/soup.h>
+#include <libxml/xpath.h>
+#include <libxml/HTMLparser.h>
+#include <libxml/HTMLtree.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,6 +15,8 @@ struct _NgpodDownloaderPrivate
     GDate *date;
     gchar *link;
     gchar *resolution;
+    gchar *title;
+    gchar *description;
     SoupMessage *image_response_message;
     const char *data;
     gsize data_length;
@@ -61,6 +66,10 @@ ngpod_downloader_finalize (GObject *gobject)
     NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
     g_object_unref (priv->session);
     g_clear_object (&priv->image_response_message);
+    g_free (priv->title);
+    g_free (priv->description);
+    g_free (priv->link);
+    g_free (priv->resolution);
 
     /* Chain up to the parent class */
     G_OBJECT_CLASS (ngpod_downloader_parent_class)->finalize (gobject);
@@ -99,6 +108,8 @@ ngpod_downloader_init (NgpodDownloader *self)
     priv->date = NULL;
     priv->link = NULL;
     priv->resolution = NULL;
+    priv->title = NULL;
+    priv->description = NULL;
     priv->data = NULL;
     priv->data_length = 0;
     priv->status = NGPOD_DOWNLOADER_STATUS_FAILED;
@@ -122,6 +133,11 @@ const gchar *NGPOD_DOWNLOADER_DEFAULT_URL = "http://photography.nationalgeograph
  */
 
 static void site_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_data);
+static void set_date (NgpodDownloader *self, const char *data);
+static gboolean set_link_and_resolution (NgpodDownloader *self, const char *data);
+static void set_title (NgpodDownloader *self, const char *data, guint length);
+static void set_description (NgpodDownloader *self, const char *data, guint length);
+static gchar *get_xpath_value (const char *data, guint length, const gchar *xpath);
 static gint regex_substr (const gchar *text, gchar *regex_text, gchar ***result);
 static void regex_substr_free (gchar ***result, gint count);
 static GDate* date_from_strings (gchar ***strs);
@@ -177,6 +193,19 @@ ngpod_downloader_get_data_length (const NgpodDownloader *self)
     return priv->data_length;
 }
 
+const gchar *
+ngpod_downloader_get_title (const NgpodDownloader *self)
+{
+    NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
+    return priv->title;
+}
+
+const gchar *ngpod_downloader_get_description (const NgpodDownloader *self)
+{
+    NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
+    return priv->description;
+}
+
 gboolean
 ngpod_downloader_is_success (const NgpodDownloader *self)
 {
@@ -212,9 +241,30 @@ site_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_da
         return;
     }
 
-    gchar **substrs;
-    guint count = regex_substr (body->data, "<p class=\"publication_time\">([^<]{3})[^<]* ([^<]*), ([^<]*)</p>", &substrs);
+    set_date (self, body->data);
 
+    if (!set_link_and_resolution (self, body->data))
+    {
+        priv->status = NGPOD_DOWNLOADER_STATUS_SUCCESS_NO_IMAGE;
+        emit_download_finished (self);
+        return;
+    }
+
+    set_title (self, body->data, body->length);
+    set_description (self, body->data, body->length);
+
+    download_image (self);
+}
+
+static void
+set_date (NgpodDownloader *self, const char *data)
+{
+    NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
+    gchar **substrs;
+    guint count = regex_substr (data, "<p class=\"publication_time\">([^<]{3})[^<]* ([^<]*), ([^<]*)</p>", &substrs);
+
+    g_free (priv->date);
+    priv->date = NULL;
 
     if (count == 3)
     {
@@ -222,27 +272,92 @@ site_download_callback (SoupSession *session, SoupMessage *msg, gpointer user_da
     }
 
     regex_substr_free (&substrs, count);
+}
 
-    count = regex_substr (body->data, "<div class=\"download_link\">[^<]*<a href=\"([^>]*)\">Download Wallpaper \\((.*) pixels\\)</a>[^<]*</div>", &substrs);
+static gboolean
+set_link_and_resolution (NgpodDownloader *self, const char *data)
+{
+    NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
+    gchar **substrs;
+    guint count = regex_substr (data, "<div class=\"download_link\">[^<]*<a href=\"([^>]*)\">Download Wallpaper \\((.*) pixels\\)</a>[^<]*</div>", &substrs);
+    gboolean ret = FALSE;
+
+    g_free (priv->resolution);
+    priv->resolution = NULL;
+
+    g_free (priv->link);
+    priv->link = NULL;
 
     if (count >= 2)
     {
         priv->resolution = substrs[1];
         priv->link = substrs[0];
-    }
-    else
-    {
-        priv->status = NGPOD_DOWNLOADER_STATUS_SUCCESS_NO_IMAGE;
-        emit_download_finished (self);
-        return;
-    }
-
-    if (count)
-    {
+        ret = TRUE;
         g_free (substrs);
     }
+    else if (count > 0)
+    {
+        regex_substr_free (&substrs, count);
+    }
 
-    download_image (self);
+    return ret;
+}
+
+static void
+set_title (NgpodDownloader *self, const char *data, guint length)
+{
+    NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
+
+    g_free (priv->title);
+    priv->title = NULL;
+
+    priv->title = get_xpath_value(data, length, "//*[@id=\"caption\"]/h2");
+    if (priv->title != NULL) log_message ("Downloader", "title: %s", priv->title);
+}
+
+static void
+set_description (NgpodDownloader *self, const char *data, guint length)
+{
+    NgpodDownloaderPrivate *priv = GET_PRIVATE (self);
+
+    g_free (priv->description);
+    priv->description = NULL;
+
+    priv->description = get_xpath_value(data, length, "//*[@id=\"caption\"]/p[4]");
+    if (priv->description != NULL) log_message ("Downloader", "desctiption: %s", priv->description);
+}
+
+static gchar *
+get_xpath_value (const char *data, guint length, const gchar *xpath)
+{
+    htmlDocPtr doc = htmlReadMemory (data, length, NULL, NULL, HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING | HTML_PARSE_NONET);
+    xmlXPathContextPtr context = xmlXPathNewContext (doc);
+    xmlXPathObjectPtr result = xmlXPathEvalExpression ((xmlChar *) xpath, context);
+    gchar *xpath_value = NULL;
+
+    if (!xmlXPathNodeSetIsEmpty (result->nodesetval))
+    {
+        xmlBufferPtr nodeBuffer = xmlBufferCreate();
+        xmlNodePtr node = result->nodesetval->nodeTab[0]->children;
+
+        while (node != NULL)
+        {
+            xmlBufferPtr tempBuffer = xmlBufferCreate();
+            htmlNodeDump (tempBuffer, doc, node);
+            xmlBufferAdd (nodeBuffer, tempBuffer->content, tempBuffer->use);
+            xmlBufferFree (tempBuffer);
+            node = node->next;
+        }
+
+        xpath_value = g_strndup ((gchar *) nodeBuffer->content, nodeBuffer->use);
+        xmlBufferFree (nodeBuffer);
+    }
+
+    xmlXPathFreeObject (result);
+    xmlXPathFreeContext (context);
+    xmlFreeDoc (doc);
+
+    return xpath_value;
 }
 
 static void

@@ -170,7 +170,9 @@ watcher_finished_event (NgpodWatcher *watcher, gpointer data)
                 ngpod_presenter_notify (
                     priv->presenter,
                     ngpod_downloader_get_data (downloader),
-                    ngpod_downloader_get_data_length (downloader));
+                    ngpod_downloader_get_data_length (downloader),
+                    ngpod_downloader_get_title (downloader),
+                    ngpod_downloader_get_description (downloader));
                 break;
         }
     }

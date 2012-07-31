@@ -15,6 +15,8 @@ struct _NgpodPresenterPrivate
 
     const char *data;
     gsize data_length;
+    const char *title;
+    const char *description;
 };
 
 enum
@@ -97,6 +99,8 @@ ngpod_presenter_init (NgpodPresenter *self)
     priv->icon = NULL;
     priv->data = NULL;
     priv->data_length = 0;
+    priv->title = NULL;
+    priv->description = NULL;
     priv->is_accepted = FALSE;
 }
 
@@ -108,12 +112,14 @@ ngpod_presenter_new (void)
 }
 
 void
-ngpod_presenter_notify (NgpodPresenter *self, const char *data, const gsize data_length)
+ngpod_presenter_notify (NgpodPresenter *self, const char *data, const gsize data_length, const gchar *title, const gchar *description)
 {
     NgpodPresenterPrivate *priv = GET_PRIVATE (self);
 
     priv->data = data;
     priv->data_length = data_length;
+    priv->title = title;
+    priv->description = description;
 
     ngpod_presenter_show_tray (self);
 }
@@ -163,17 +169,12 @@ ngpod_presenter_show_window (NgpodPresenter *self)
 
         priv->window = GTK_WIDGET (gtk_builder_get_object (builder, "picture-dialog"));
         gtk_builder_connect_signals (builder, NULL);
-        g_object_unref (builder);
 
-        GtkVBox *dialog_vbox = GTK_VBOX (gtk_bin_get_child (GTK_BIN (priv->window)));
-        GList *children = gtk_container_get_children (GTK_CONTAINER (dialog_vbox));
+        GtkImage *image = GTK_IMAGE (gtk_builder_get_object (builder, "image"));
+        GtkLabel *description_label = GTK_LABEL (gtk_builder_get_object (builder, "description-label"));
 
-        GtkImage *image = GTK_IMAGE (g_list_first (children)->data);
-
-        GtkHButtonBox *button_box = GTK_HBUTTON_BOX (g_list_first (children)->next->data);
-        children = gtk_container_get_children (GTK_CONTAINER (button_box));
-        priv->accept_btn = GTK_BUTTON (g_list_first (children)->data);
-        priv->deny_btn = GTK_BUTTON (g_list_first (children)->next->data);
+        priv->accept_btn = GTK_BUTTON (gtk_builder_get_object (builder, "accept_button"));
+        priv->deny_btn = GTK_BUTTON (gtk_builder_get_object (builder, "refuse_button"));
 
         g_signal_connect (priv->window, "destroy", G_CALLBACK (destroy_event), &priv->window);
         g_signal_connect (priv->accept_btn, "clicked", G_CALLBACK (button_clicked_event), self);
@@ -192,6 +193,11 @@ ngpod_presenter_show_window (NgpodPresenter *self)
         g_clear_object (&stream);
         g_clear_object (&pixbuf);
         g_clear_object (&scaled_pixbuf);
+        g_object_unref (builder);
+
+        gtk_widget_set_size_request (GTK_WIDGET (description_label), dest_width, -1);
+        gtk_label_set_markup (description_label, priv->description);
+        gtk_window_set_title (GTK_WINDOW (priv->window), priv->title);
     }
 
     gtk_widget_set_visible (priv->window, TRUE);
