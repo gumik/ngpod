@@ -467,6 +467,7 @@ static const gchar *months[] =
     "May",
     "Jun",
     "Jul",
+    "Aug",
     "Sep",
     "Oct",
     "Nov",
