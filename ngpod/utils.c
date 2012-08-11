@@ -127,3 +127,12 @@ regex_substr_free (gchar ***result, gint count)
         g_free (*result);
     }
 }
+
+gchar *
+g_str_replace (const gchar *input, const gchar *search, const gchar *replace)
+{
+    gchar **tokens = g_strsplit (input, search, 0);
+    gchar *replaced = g_strjoinv (replace, tokens);
+    g_strfreev (tokens);
+    return replaced;
+}

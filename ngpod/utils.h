@@ -10,5 +10,6 @@ GDate *date_from_string (gchar *str);
 gchar *date_to_string (GDate *date);
 gint regex_substr (const gchar *text, gchar *regex_text, gchar ***result);
 void regex_substr_free (gchar ***result, gint count);
+gchar *g_str_replace (const gchar *input, const gchar *search, const gchar *replace);
 
 #endif

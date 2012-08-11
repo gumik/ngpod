@@ -34,6 +34,7 @@ static void ngpod_presenter_show_window (NgpodPresenter *self);
 static void ngpod_presenter_hide_window (NgpodPresenter *self);
 static void ngpod_presenter_show_tray (NgpodPresenter *self);
 static void ngpod_presenter_hide_tray (NgpodPresenter *self);
+static GtkBuilder *get_builder ();
 static void status_icon_activate (GtkStatusIcon *icon, gpointer data);
 static void destroy_event (GObject *object, gpointer data);
 static void button_clicked_event (GtkButton *btn, gpointer data);
@@ -164,15 +165,9 @@ ngpod_presenter_show_window (NgpodPresenter *self)
 
     if (priv->window == NULL)
     {
-        GBytes *gui_bytes = g_resources_lookup_data ("/gumik/ngpod/gui.glade", G_RESOURCE_LOOKUP_FLAGS_NONE, NULL);
-        gsize data_length = 0;
-        gconstpointer data = g_bytes_get_data (gui_bytes, &data_length);
-        GtkBuilder *builder = gtk_builder_new ();
-        gtk_builder_add_from_string (builder, data, data_length, NULL);
-        g_bytes_unref (gui_bytes);
+        GtkBuilder *builder = get_builder ();
 
         priv->window = GTK_WIDGET (gtk_builder_get_object (builder, "picture-dialog"));
-        gtk_builder_connect_signals (builder, NULL);
 
         GtkImage *image = GTK_IMAGE (gtk_builder_get_object (builder, "image"));
         GtkLabel *description_label = GTK_LABEL (gtk_builder_get_object (builder, "description-label"));
@@ -200,7 +195,9 @@ ngpod_presenter_show_window (NgpodPresenter *self)
         g_object_unref (builder);
 
         gtk_widget_set_size_request (GTK_WIDGET (description_label), dest_width, -1);
-        gtk_label_set_markup (description_label, priv->description);
+        gchar *description = g_str_replace (priv->description, "em>", "i>");
+        gtk_label_set_markup (description_label, description);
+        g_free (description);
         gtk_window_set_title (GTK_WINDOW (priv->window), priv->title);
     }
 
@@ -251,6 +248,19 @@ ngpod_presenter_hide_tray (NgpodPresenter *self)
         g_object_unref (priv->icon);
         priv->icon = NULL;
     }
+}
+
+static GtkBuilder *
+get_builder ()
+{
+    GBytes *gui_bytes = g_resources_lookup_data ("/gumik/ngpod/gui.glade", G_RESOURCE_LOOKUP_FLAGS_NONE, NULL);
+    gsize data_length = 0;
+    gconstpointer data = g_bytes_get_data (gui_bytes, &data_length);
+    GtkBuilder *builder = gtk_builder_new ();
+    gtk_builder_add_from_string (builder, data, data_length, NULL);
+    g_bytes_unref (gui_bytes);
+    gtk_builder_connect_signals (builder, NULL);
+    return builder;
 }
 
 static void
