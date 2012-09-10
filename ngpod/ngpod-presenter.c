@@ -37,6 +37,7 @@ static void ngpod_presenter_hide_tray (NgpodPresenter *self);
 static void status_icon_activate (GtkStatusIcon *icon, gpointer data);
 static void destroy_event (GObject *object, gpointer data);
 static void button_clicked_event (GtkButton *btn, gpointer data);
+static gchar *get_file_path (const gchar *filename);
 
 static void
 ngpod_presenter_dispose (GObject *gobject)
@@ -165,7 +166,10 @@ ngpod_presenter_show_window (NgpodPresenter *self)
     if (priv->window == NULL)
     {
         GtkBuilder *builder = gtk_builder_new ();
-        gtk_builder_add_from_file (builder, "/home/km/temp/ngpod/ngpod/gui.glade", NULL);
+
+        gchar *path = get_file_path ("gui.glade");
+        gtk_builder_add_from_file (builder, path, NULL);
+        g_free (path);
 
         priv->window = GTK_WIDGET (gtk_builder_get_object (builder, "picture-dialog"));
         gtk_builder_connect_signals (builder, NULL);
@@ -223,7 +227,10 @@ ngpod_presenter_show_tray (NgpodPresenter *self)
     if (priv->icon == NULL)
     {
         priv->icon = gtk_status_icon_new ();
-        GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file ("/home/km/temp/ngpod/ngpod/NG_Yellow_Frame.png", NULL);
+
+        gchar *path = get_file_path ("NG_Yellow_Frame.png");
+        GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file (path, NULL);
+        g_free (path);
 
         gtk_status_icon_set_from_pixbuf (priv->icon, pixbuf);
         g_signal_connect (priv->icon, "activate", G_CALLBACK (status_icon_activate), self);
@@ -272,4 +279,15 @@ button_clicked_event (GtkButton *btn, gpointer data)
     priv->is_accepted = (btn == priv->accept_btn);
 
     g_signal_emit (self, signals[MADE_CHOICE], 0);
+}
+
+static gchar *
+get_file_path (const gchar *filename)
+{
+    gchar *dir_file = g_file_read_link ("/proc/self/exe", NULL);
+    gchar *dir = g_path_get_dirname (dir_file);
+    gchar *path = g_build_filename (dir, filename, NULL);
+    g_free (dir_file);
+    g_free (dir);
+    return path;
 }
