@@ -30,7 +30,9 @@
 
 			"-I/usr/include/mateconf/2",
 
-			"-I/usr/include/libxml2"
+			"-I/usr/include/libxml2",
+
+			"-I${folder:${project_path:main.c}}"
 		]
 	}
 }

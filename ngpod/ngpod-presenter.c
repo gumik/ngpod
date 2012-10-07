@@ -34,10 +34,11 @@ static void ngpod_presenter_show_window (NgpodPresenter *self);
 static void ngpod_presenter_hide_window (NgpodPresenter *self);
 static void ngpod_presenter_show_tray (NgpodPresenter *self);
 static void ngpod_presenter_hide_tray (NgpodPresenter *self);
-static GtkBuilder *get_builder ();
+static GtkBuilder *get_builder (void);
 static void status_icon_activate (GtkStatusIcon *icon, gpointer data);
 static void destroy_event (GObject *object, gpointer data);
 static void button_clicked_event (GtkButton *btn, gpointer data);
+static void set_adjusted_description (NgpodPresenter *self, GtkLabel *description_label);
 
 static void
 ngpod_presenter_dispose (GObject *gobject)
@@ -194,10 +195,7 @@ ngpod_presenter_show_window (NgpodPresenter *self)
         g_clear_object (&scaled_pixbuf);
         g_object_unref (builder);
 
-        gtk_widget_set_size_request (GTK_WIDGET (description_label), dest_width, -1);
-        gchar *description = g_str_replace (priv->description, "em>", "i>");
-        gtk_label_set_markup (description_label, description);
-        g_free (description);
+        set_adjusted_description (self, description_label);
         gtk_window_set_title (GTK_WINDOW (priv->window), priv->title);
     }
 
@@ -288,4 +286,20 @@ button_clicked_event (GtkButton *btn, gpointer data)
     priv->is_accepted = (btn == priv->accept_btn);
 
     g_signal_emit (self, signals[MADE_CHOICE], 0);
+}
+
+static void
+set_adjusted_description (NgpodPresenter *self, GtkLabel *description_label)
+{
+    NgpodPresenterPrivate *priv = GET_PRIVATE (self);
+
+    gchar *d1 = g_str_replace (priv->description, "em>", "i>");
+    gchar *d2 = g_str_replace (d1, "<br>", "");
+    gchar *d3 = g_str_replace (d2, "strong>", "b>");
+
+    gtk_label_set_markup (description_label, d3);
+
+    g_free (d1);
+    g_free (d2);
+    g_free (d3);
 }
