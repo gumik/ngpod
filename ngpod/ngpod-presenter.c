@@ -38,6 +38,7 @@ static GtkBuilder *get_builder (void);
 static void status_icon_activate (GtkStatusIcon *icon, gpointer data);
 static void destroy_event (GObject *object, gpointer data);
 static void button_clicked_event (GtkButton *btn, gpointer data);
+static void label_size_allocated_event (GtkLabel *label, GdkRectangle *allocation, gpointer data);
 static void set_adjusted_description (NgpodPresenter *self, GtkLabel *description_label);
 
 static void
@@ -179,6 +180,7 @@ ngpod_presenter_show_window (NgpodPresenter *self)
         g_signal_connect (priv->window, "destroy", G_CALLBACK (destroy_event), &priv->window);
         g_signal_connect (priv->accept_btn, "clicked", G_CALLBACK (button_clicked_event), self);
         g_signal_connect (priv->deny_btn, "clicked", G_CALLBACK (button_clicked_event), self);
+        g_signal_connect (description_label, "size-allocate", G_CALLBACK (label_size_allocated_event), self);
 
         GInputStream *stream = g_memory_input_stream_new_from_data (priv->data, priv->data_length, NULL);
         GdkPixbuf *pixbuf = gdk_pixbuf_new_from_stream (stream, NULL, NULL);
@@ -286,6 +288,12 @@ button_clicked_event (GtkButton *btn, gpointer data)
     priv->is_accepted = (btn == priv->accept_btn);
 
     g_signal_emit (self, signals[MADE_CHOICE], 0);
+}
+
+static void
+label_size_allocated_event (GtkLabel *label, GdkRectangle *allocation, gpointer data)
+{
+    gtk_widget_set_size_request (GTK_WIDGET (label), allocation->width, -1);
 }
 
 static void
