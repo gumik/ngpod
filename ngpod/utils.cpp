@@ -1,81 +1,81 @@
 #include "utils.h"
 #include <stdlib.h>
 
-guint
-create_void_void_signal (const gchar *signal_name)
+// guint
+// create_void_void_signal (const gchar *signal_name)
+// {
+//     return g_signal_newv (
+//         signal_name,
+//         G_TYPE_OBJECT,
+//         G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+//         NULL /* closure */,
+//         NULL /* accumulator */,
+//         NULL /* accumulator data */,
+//         g_cclosure_marshal_VOID__VOID,
+//         G_TYPE_NONE /* return_type */,
+//         0     /* n_params */,
+//         NULL  /* param_types */);
+// }
+
+// void
+// log_message (const gchar *class_name, const gchar *format, ...)
+// {
+//     va_list list;
+//     va_start (list, format);
+//     g_logv (class_name, G_LOG_LEVEL_MESSAGE, format, list);
+//     va_end (list);
+// }
+
+// static const gchar *months[] =
+// {
+//     "Jan",
+//     "Feb",
+//     "Mar",
+//     "Apr",
+//     "May",
+//     "Jun",
+//     "Jul",
+//     "Aug",
+//     "Sep",
+//     "Oct",
+//     "Nov",
+//     "Dec"
+// };
+
+Glib::Date date_from_string (Glib::ustring& sstr)
 {
-    return g_signal_newv (
-        signal_name,
-        G_TYPE_OBJECT,
-        G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-        NULL /* closure */,
-        NULL /* accumulator */,
-        NULL /* accumulator data */,
-        g_cclosure_marshal_VOID__VOID,
-        G_TYPE_NONE /* return_type */,
-        0     /* n_params */,
-        NULL  /* param_types */);
-}
+    // const gchar *str = sstr.c_str();
+    // gchar **substrs;
+    // guint count = regex_substr (str, "([^<]{3})[^<]* ([^<]*), ([^<]*)", &substrs);
 
-void
-log_message (const gchar *class_name, const gchar *format, ...)
-{
-    va_list list;
-    va_start (list, format);
-    g_logv (class_name, G_LOG_LEVEL_MESSAGE, format, list);
-    va_end (list);
-}
+    // gint month;
+    // for (month = 0; month < 12; ++month)
+    // {
+    //     if (g_strcmp0 (months[month], substrs[0]) == 0)
+    //     {
+    //         break;
+    //     }
+    // }
 
-static const gchar *months[] =
-{
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec"
-};
+    // if (month >= 12) return Glib::Date();
 
-GDate*
-date_from_string (gchar *str)
-{
-    gchar **substrs;
-    guint count = regex_substr (str, "([^<]{3})[^<]* ([^<]*), ([^<]*)", &substrs);
+    Glib::Date date;
+    // date.set_month(static_cast<Glib::Date::Month>(month + 1));
+    // date.set_day(static_cast<Glib::Date::Day>(atoi (substrs[1])));
+    // date.set_year(static_cast<Glib::Date::Year>(atoi (substrs[2])));
 
-    gint month;
-    for (month = 0; month < 12; ++month)
-    {
-        if (g_strcmp0 (months[month], substrs[0]) == 0)
-        {
-            break;
-        }
-    }
-
-    if (month >= 12) return NULL;
-
-    GDate *date = g_date_new ();
-    g_date_set_month (date, month + 1);
-    g_date_set_day (date, atoi (substrs[1]));
-    g_date_set_year (date, atoi (substrs[2]));
-
-    regex_substr_free (&substrs, count);
+    // regex_substr_free (&substrs, count);
 
     return date;
 }
 
-gchar *
-date_to_string (GDate *date)
-{
-    gchar *buf = g_malloc(16);
-    g_date_strftime (buf, 16, "%Y-%m-%d", date);
-    return buf;
-}
+// gchar *
+// date_to_string (GDate *date)
+// {
+//     gchar *buf = g_malloc(16);
+//     g_date_strftime (buf, 16, "%Y-%m-%d", date);
+//     return buf;
+// }
 
 gint
 regex_substr (const gchar *text, gchar *regex_text, gchar ***result)
@@ -128,11 +128,11 @@ regex_substr_free (gchar ***result, gint count)
     }
 }
 
-gchar *
-g_str_replace (const gchar *input, const gchar *search, const gchar *replace)
-{
-    gchar **tokens = g_strsplit (input, search, 0);
-    gchar *replaced = g_strjoinv (replace, tokens);
-    g_strfreev (tokens);
-    return replaced;
-}
+// gchar *
+// g_str_replace (const gchar *input, const gchar *search, const gchar *replace)
+// {
+//     gchar **tokens = g_strsplit (input, search, 0);
+//     gchar *replaced = g_strjoinv (replace, tokens);
+//     g_strfreev (tokens);
+//     return replaced;
+// }

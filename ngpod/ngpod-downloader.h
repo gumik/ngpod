@@ -1,58 +1,72 @@
 #ifndef __NGPOD_DOWNLOADER_H__
 #define __NGPOD_DOWNLOADER_H__
 
-#include <glib-object.h>
+#include <glibmm/date.h>
+#include <glibmm/ustring.h>
+#include <glibmm/signalproxy.h>
 
-#define NGPOD_TYPE_DOWNLOADER                  (ngpod_downloader_get_type ())
-#define NGPOD_DOWNLOADER(obj)                  (G_TYPE_CHECK_INSTANCE_CAST ((obj), NGPOD_TYPE_DOWNLOADER, NgpodDownloader))
-#define NGPOD_IS_DOWNLOADER(obj)               (G_TYPE_CHECK_INSTANCE_TYPE ((obj), NGPOD_TYPE_DOWNLOADER))
-#define NGPOD_DOWNLOADER_CLASS(klass)          (G_TYPE_CHECK_CLASS_CAST ((klass), NGPOD_TYPE_DOWNLOADER, NgpodDownloaderClass))
-#define NGPOD_IS_DOWNLOADER_CLASS(klass)       (G_TYPE_CHECK_CLASS_TYPE ((klass), NGPOD_TYPE_DOWNLOADER))
-#define NGPOD_DOWNLOADER_GET_CLASS(obj)        (G_TYPE_INSTANCE_GET_CLASS ((obj), NGPOD_TYPE_DOWNLOADER, NgpodDownloaderClass))
+#include <libsoup/soup.h>
+#include <libxml/xpath.h>
+#include <libxml/HTMLparser.h>
+#include <libxml/HTMLtree.h>
 
-typedef struct _NgpodDownloader        NgpodDownloader;
-typedef struct _NgpodDownloaderClass   NgpodDownloaderClass;
-typedef struct _NgpodDownloaderPrivate NgpodDownloaderPrivate;
-
-typedef enum
+namespace ngpod
 {
-	NGPOD_DOWNLOADER_STATUS_SUCCESS,
-	NGPOD_DOWNLOADER_STATUS_SUCCESS_NO_IMAGE,
-	NGPOD_DOWNLOADER_STATUS_FAILED,
-	NGPOD_DOWNLOADER_STATUS_FAILED_GET_IMAGE
-} NgpodDownloaderStatus;
 
-struct _NgpodDownloader
+class Downloader
 {
-    GObject          parent_instance;
-    NgpodDownloaderPrivate *priv;
+public:
+    enum Status
+    {
+        SUCCESS,
+        SUCCESS_NO_IMAGE,
+        FAILED,
+        FAILED_GET_IMAGE
+    };
+
+    Downloader();
+    virtual ~Downloader();
+
+    void Start(const Glib::ustring& url);
+    const Glib::Date& GetDate() const { return date; }
+    const Glib::ustring& GetLink() const { return link; }
+    const char* GetData() const { return data; }
+    int GetDataLength() const { return data_length; }
+    const Glib::ustring& GetTitle() const { return title; }
+    const Glib::ustring& GetDescription() const { return description; }
+    Status GetStatus() const { return status; }
+    bool IsSuccess() const;
+
+    static Glib::ustring DEFAULT_URL;
+
+protected:
+    Glib::SignalProxy0<void> signal_DownloadFinished();
+
+private:
+    void DownloadImage();
+    void EmitDownloadFinished();
+    void ImageDownloadCallback(SoupSession *session, SoupMessage *msg);
+    bool SetLink(const char* data, int length);
+    void SetTitle(const char* data, int length);
+    void SetDate(const char* data, int length);
+    void SetDescription(const char* data, int length);
+    void SiteDownloadCallback(SoupSession* session, SoupMessage* msg);
+    static Glib::ustring GetXPathValue(const char *data, guint length, const gchar *xpath);
+    static Glib::ustring GetXpathAttributeValue(const char *data, guint length, const gchar *xpath, const gchar *attribute);
+    static void SiteDownloadCallbackStatic(SoupSession* session, SoupMessage* msg, gpointer user_data);
+    static void ImageDownloadCallbackStatic(SoupSession *session, SoupMessage *msg, gpointer user_data);
+
+    SoupSession *session;
+    Glib::Date date;
+    Glib::ustring link;
+    Glib::ustring title;
+    Glib::ustring description;
+    SoupMessage *image_response_message;
+    const char *data;
+    int data_length;
+    Status status;
 };
 
-struct _NgpodDownloaderClass
-{
-    GObjectClass parent_class;
-};
-
-/* used by NGPOD_TYPE_DOWNLOADER */
-GType ngpod_downloader_get_type (void);
-NgpodDownloader *ngpod_downloader_new (void);
-
-/*
- * Static fields
- */
-const gchar *NGPOD_DOWNLOADER_DEFAULT_URL;
-
-/*
- * Method definitions.
- */
-void ngpod_downloader_start (NgpodDownloader *self, const gchar *url);
-const GDate* ngpod_downloader_get_date (const NgpodDownloader *self);
-const gchar* ngpod_downloader_get_link (const NgpodDownloader *self);
-const char* ngpod_downloader_get_data (const NgpodDownloader *self);
-gsize ngpod_downloader_get_data_length (const NgpodDownloader *self);
-const gchar *ngpod_downloader_get_title (const NgpodDownloader *self);
-const gchar *ngpod_downloader_get_description (const NgpodDownloader *self);
-gboolean ngpod_downloader_is_success (const NgpodDownloader *self);
-NgpodDownloaderStatus ngpod_downloader_get_status (const NgpodDownloader *self);
+}
 
 #endif /* __NGPOD_DOWNLOADER_H__ */
