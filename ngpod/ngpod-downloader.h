@@ -37,10 +37,9 @@ public:
     Status GetStatus() const { return status; }
     bool IsSuccess() const;
 
-    static Glib::ustring DEFAULT_URL;
-
-protected:
     Glib::SignalProxy0<void> signal_DownloadFinished();
+
+    static Glib::ustring DEFAULT_URL;
 
 private:
     void DownloadImage();
