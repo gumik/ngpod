@@ -1,41 +1,52 @@
 #ifndef __NGPOD_PRESENTER_H__
 #define __NGPOD_PRESENTER_H__
 
-#include <glib-object.h>
+#include <glibmm.h>
+#include <gtkmm.h>
 
-#define NGPOD_TYPE_PRESENTER                  (ngpod_presenter_get_type ())
-#define NGPOD_PRESENTER(obj)                  (G_TYPE_CHECK_INSTANCE_CAST ((obj), NGPOD_TYPE_PRESENTER, NgpodPresenter))
-#define NGPOD_IS_PRESENTER(obj)               (G_TYPE_CHECK_INSTANCE_TYPE ((obj), NGPOD_TYPE_PRESENTER))
-#define NGPOD_PRESENTER_CLASS(klass)          (G_TYPE_CHECK_CLASS_CAST ((klass), NGPOD_TYPE_PRESENTER, NgpodPresenterClass))
-#define NGPOD_IS_PRESENTER_CLASS(klass)       (G_TYPE_CHECK_CLASS_TYPE ((klass), NGPOD_TYPE_PRESENTER))
-#define NGPOD_PRESENTER_GET_CLASS(obj)        (G_TYPE_INSTANCE_GET_CLASS ((obj), NGPOD_TYPE_PRESENTER, NgpodPresenterClass))
-
-typedef struct _NgpodPresenter        NgpodPresenter;
-typedef struct _NgpodPresenterClass   NgpodPresenterClass;
-typedef struct _NgpodPresenterPrivate NgpodPresenterPrivate;
-
-struct _NgpodPresenter
+namespace ngpod
 {
-    GObject          parent_instance;
-    NgpodPresenterPrivate *priv;
+
+class Presenter
+{
+public:
+    Presenter();
+    ~Presenter();
+
+    void Notify(const char* data, gsize data_length, const Glib::ustring& title,
+                const Glib::ustring& description);
+    void Hide();
+    void ShowError(const Glib::ustring& msg);
+    bool IsAccepted() const { return is_accepted; }
+
+    Glib::SignalProxy0<void> signal_MadeChoice();
+
+private:
+    void ShowWindow ();
+    void HideWindow ();
+    void ShowTray ();
+    void HideTray ();
+    Glib::RefPtr<Gtk::Builder> GetBuilder();
+    void StatusIconActivateCallback ();
+    // void DestroyEvent ();
+    void AcceptButtonClickedCallback ();
+    void DenyButtonClickedCallback ();
+    void LabelSizeAllocatedCallback (Gtk::Allocation& allocation);
+    void SetAdjustedDescription (Glib::RefPtr<Gtk::Label> description_label);
+
+    Glib::RefPtr<Gtk::Window> window;
+    Glib::RefPtr<Gtk::StatusIcon> icon;
+    Glib::RefPtr<Gtk::Button> accept_btn;
+    Glib::RefPtr<Gtk::Button> deny_btn;
+
+    bool is_accepted;
+
+    const char *data;
+    gsize data_length;
+    Glib::ustring title;
+    Glib::ustring description;
 };
 
-struct _NgpodPresenterClass
-{
-    GObjectClass parent_class;
-};
-
-/* used by NGPOD_TYPE_PRESENTER */
-GType ngpod_presenter_get_type (void);
-
-NgpodPresenter *ngpod_presenter_new (void);
-
-/*
- * Method definitions.
- */
-void ngpod_presenter_notify (NgpodPresenter *self, const char *data, const gsize data_length, const gchar *title, const gchar *desctiption);
-void ngpod_presenter_hide (NgpodPresenter *self);
-void ngpod_presenter_show_error (NgpodPresenter *self, const gchar *msg);
-gboolean ngpod_presenter_is_accepted (NgpodPresenter *self);
+}
 
 #endif /* __NGPOD_PRESENTER_H__ */

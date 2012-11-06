@@ -11,6 +11,6 @@ Glib::Date date_from_string (const Glib::ustring& str);
 Glib::ustring date_to_string (const Glib::Date& date);
 // gint regex_substr (const gchar *text, gchar *regex_text, gchar ***result);
 // void regex_substr_free (gchar ***result, gint count);
-// gchar *g_str_replace (const gchar *input, const gchar *search, const gchar *replace);
+ gchar *g_str_replace (const gchar *input, const gchar *search, const gchar *replace);
 
 #endif

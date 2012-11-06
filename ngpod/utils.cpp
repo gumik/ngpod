@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <stdlib.h>
+#include <glib.h>
 
 // guint
 // create_void_void_signal (const gchar *signal_name)
@@ -17,14 +18,14 @@
 //         NULL  /* param_types */);
 // }
 
-// void
-// log_message (const gchar *class_name, const gchar *format, ...)
-// {
-//     va_list list;
-//     va_start (list, format);
-//     g_logv (class_name, G_LOG_LEVEL_MESSAGE, format, list);
-//     va_end (list);
-// }
+void
+log_message (const gchar *class_name, const gchar *format, ...)
+{
+    va_list list;
+    va_start (list, format);
+    g_logv (class_name, G_LOG_LEVEL_MESSAGE, format, list);
+    va_end (list);
+}
 
 // static const gchar *months[] =
 // {
@@ -128,11 +129,11 @@ regex_substr_free (gchar ***result, gint count)
     }
 }
 
-// gchar *
-// g_str_replace (const gchar *input, const gchar *search, const gchar *replace)
-// {
-//     gchar **tokens = g_strsplit (input, search, 0);
-//     gchar *replaced = g_strjoinv (replace, tokens);
-//     g_strfreev (tokens);
-//     return replaced;
-// }
+gchar *
+g_str_replace (const gchar *input, const gchar *search, const gchar *replace)
+{
+    gchar **tokens = g_strsplit (input, search, 0);
+    gchar *replaced = g_strjoinv (replace, tokens);
+    g_strfreev (tokens);
+    return replaced;
+}
