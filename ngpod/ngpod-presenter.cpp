@@ -64,13 +64,13 @@ void Presenter::ShowWindow ()
     {
         RefPtr<Builder> builder = GetBuilder ();
 
-        window = builder->get_object("picture-dialog");
+        window = RefPtr<Window>::cast_static(builder->get_object("picture-dialog"));
 
-        RefPtr<Image> image = builder->get_object("image");
-        RefPtr<Label> description_label = builder->get_object("description_label");
+        RefPtr<Image> image = RefPtr<Image>::cast_static(builder->get_object("image"));
+        RefPtr<Label> description_label = RefPtr<Label>::cast_static(builder->get_object("description_label"));
 
-        accept_btn = builder->get_object("accept_button");
-        deny_btn = builder->get_object("refuse_button");
+        accept_btn = RefPtr<Button>::cast_static(builder->get_object("accept_button"));
+        deny_btn = RefPtr<Button>::cast_static(builder->get_object("refuse_button"));
 
         // g_signal_connect (priv->window, "destroy", G_CALLBACK (destroy_event), &priv->window);
         accept_btn->signal_clicked().connect(mem_fun(*this, &Presenter::AcceptButtonClickedCallback));

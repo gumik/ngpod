@@ -82,11 +82,11 @@ gint
 regex_substr (const gchar *text, gchar *regex_text, gchar ***result)
 {
     GError *error = NULL;
-    GRegex *regex = g_regex_new (regex_text, 0, 0, &error);
+    GRegex *regex = g_regex_new (regex_text, (GRegexCompileFlags)0, (GRegexMatchFlags)0, &error);
     g_return_val_if_fail (!error, 0);
 
     GMatchInfo *match_info;
-    if (!g_regex_match (regex, text, 0, &match_info))
+    if (!g_regex_match (regex, text, (GRegexMatchFlags)0, &match_info))
     {
         return 0;
     }

@@ -13,10 +13,12 @@
 #include "config.h"
 #include "utils.h"
 
-GMainLoop *main_loop;
-NgpodDownloader *downloader;
+using namespace ngpod;
+using namespace Glib;
 
-static gchar *log_file = NULL;
+GMainLoop *main_loop;
+
+static ustring log_file;
 static GFileOutputStream *os = NULL;
 
 static void log_to_file (const gchar *msg, gsize length)
@@ -27,7 +29,7 @@ static void log_to_file (const gchar *msg, gsize length)
 
         if (os == NULL)
         {
-            GFile *file = g_file_new_for_path (log_file);
+            GFile *file = g_file_new_for_path (log_file.c_str());
             os = g_file_append_to (file, G_FILE_CREATE_NONE, NULL, &error);
 
             if (os == NULL)
@@ -76,48 +78,47 @@ log_func (const gchar *log_domain, GLogLevelFlags log_level, const gchar *messag
 
 int main (int argc, char **argv)
 {
+    Glib::RefPtr<Gtk::Application> app =
+    Gtk::Application::create(argc, argv,
+      "gumik.ngpod");
+
     g_print ("ngpod %d.%d - National Geographic Picture of the Day wallpaper downloader\n",
         VERSION_MAJOR, VERSION_MINOR);
 
-    gtk_init (&argc, &argv);
+    // gtk_init (&argc, &argv);
 
     g_log_set_default_handler (log_func, NULL);
 
-    NgpodSettings *settings = ngpod_settings_new ();
-    ngpod_settings_initialize (settings);
+    Settings settings;
+    settings.Initialize();
 
-    log_file = ngpod_settings_get_log_file (settings);
+    log_file = settings.GetLogFile();
     if (log_file != NULL)
     {
-        log_message ("main", "Log file: %s", log_file);
+        log_message ("main", "Log file: %s", log_file.c_str());
     }
 
-    GDate *last_date = ngpod_settings_get_last_date (settings);
-    log_message ("main", "Last date: %d-%d-%d", g_date_get_year (last_date), g_date_get_month (last_date), g_date_get_day (last_date));
+    Date last_date = settings.GetLastDate();
+    log_message ("main", "Last date: %d-%d-%d", last_date.get_year(), last_date.get_month(), last_date.get_day());
 
-    gchar *dir = ngpod_settings_get_dir (settings);
-    if (dir == NULL)
+    ustring dir = settings.GetDir();
+    if (dir.empty())
     {
         g_print ("Set dir in config file\n");
         return 1;
     }
-    log_message ("main", "Dir: %s", dir);
+    log_message ("main", "Dir: %s", dir.c_str());
 
-    GTimeSpan time_span = ngpod_settings_get_time_span (settings);
+    GTimeSpan time_span = settings.GetTimeSpan();
     log_message ("main", "Time span: %dh %dmin", time_span / G_TIME_SPAN_HOUR, (time_span % G_TIME_SPAN_HOUR) / G_TIME_SPAN_MINUTE);
 
-    NgpodDownloader *downloader = ngpod_downloader_new ();
-    NgpodWatcher *watcher = ngpod_watcher_new (downloader, last_date, time_span);
-    NgpodPresenter *presenter = ngpod_presenter_new ();
-    NgpodWallpaper *wallpaper = ngpod_wallpaper_new (dir);
-    NgpodTimer *timer = ngpod_timer_new (watcher, settings, presenter, wallpaper);
+    Downloader downloader;
+    Watcher watcher(downloader, last_date, time_span);
+    Presenter presenter;
+    Wallpaper wallpaper(dir);
+    ngpod::Timer timer(watcher, settings, presenter, wallpaper);
 
-    g_object_unref (downloader);
-    g_object_unref (settings);
-    g_object_unref (watcher);
-    g_object_unref (wallpaper);
+    timer.Start();
 
-    ngpod_timer_start (timer);
-
-    gtk_main ();
+    app->run();
 }
