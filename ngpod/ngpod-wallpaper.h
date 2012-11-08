@@ -15,7 +15,7 @@ public:
     bool SetFromData(const char* data, gsize data_length, GError** error);
 
 private:
-    Glib::ustring GetPathFromDate(const Glib::DateTime& now, const Glib::ustring& dir);
+    static Glib::ustring GetPathFromDate(const Glib::DateTime& now, const Glib::ustring& dir);
 
     Glib::ustring dir;
 };

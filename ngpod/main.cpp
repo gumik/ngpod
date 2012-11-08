@@ -23,7 +23,7 @@ static GFileOutputStream *os = NULL;
 
 static void log_to_file (const gchar *msg, gsize length)
 {
-    if (log_file != NULL)
+    if (!log_file.empty())
     {
         GError *error = NULL;
 
@@ -93,7 +93,7 @@ int main (int argc, char **argv)
     settings.Initialize();
 
     log_file = settings.GetLogFile();
-    if (log_file != NULL)
+    if (!log_file.empty())
     {
         log_message ("main", "Log file: %s", log_file.c_str());
     }

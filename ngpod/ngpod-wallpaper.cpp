@@ -59,7 +59,7 @@ bool Wallpaper::SetFromData(const char *data, gsize data_length, GError **error)
 }
 
 /* private methods */
-ustring GetPathFromDate(const DateTime& now, const ustring& dir)
+ustring Wallpaper::GetPathFromDate(const DateTime& now, const ustring& dir)
 {
     ustring filename = now.format("pod-%F.png");
     return build_filename(dir, filename);

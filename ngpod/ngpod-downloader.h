@@ -37,7 +37,7 @@ public:
     Status GetStatus() const { return status; }
     bool IsSuccess() const;
 
-    Glib::SignalProxy0<void> signal_DownloadFinished();
+    sigc::signal<void> signal_DownloadFinished;
 
     static Glib::ustring DEFAULT_URL;
 

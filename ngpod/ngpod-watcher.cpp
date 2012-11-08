@@ -13,7 +13,7 @@ Watcher::Watcher(Downloader& downloader, const Glib::Date& last_date, GTimeSpan 
       status(INVALID),
       url(Downloader::DEFAULT_URL)
 {
-    downloader.signal_DownloadFinished().connect(sigc::mem_fun(*this, &Watcher::DownloadFinishedCallback));
+    downloader.signal_DownloadFinished.connect(sigc::mem_fun(*this, &Watcher::DownloadFinishedCallback));
 }
 
 Watcher::~Watcher()

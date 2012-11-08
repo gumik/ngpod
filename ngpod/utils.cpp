@@ -27,56 +27,55 @@ log_message (const gchar *class_name, const gchar *format, ...)
     va_end (list);
 }
 
-// static const gchar *months[] =
-// {
-//     "Jan",
-//     "Feb",
-//     "Mar",
-//     "Apr",
-//     "May",
-//     "Jun",
-//     "Jul",
-//     "Aug",
-//     "Sep",
-//     "Oct",
-//     "Nov",
-//     "Dec"
-// };
-
-Glib::Date date_from_string (Glib::ustring& sstr)
+static const char *months[] =
 {
-    // const gchar *str = sstr.c_str();
-    // gchar **substrs;
-    // guint count = regex_substr (str, "([^<]{3})[^<]* ([^<]*), ([^<]*)", &substrs);
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+};
 
-    // gint month;
-    // for (month = 0; month < 12; ++month)
-    // {
-    //     if (g_strcmp0 (months[month], substrs[0]) == 0)
-    //     {
-    //         break;
-    //     }
-    // }
+Glib::Date date_from_string (const Glib::ustring& sstr)
+{
+    const gchar *str = sstr.c_str();
+    gchar **substrs;
+    uint count = regex_substr (str, "([^<]{3})[^<]* ([^<]*), ([^<]*)", &substrs);
 
-    // if (month >= 12) return Glib::Date();
+    gint month;
+    for (month = 0; month < 12; ++month)
+    {
+        if (g_strcmp0 (months[month], substrs[0]) == 0)
+        {
+            break;
+        }
+    }
+
+    if (month >= 12) return Glib::Date();
 
     Glib::Date date;
-    // date.set_month(static_cast<Glib::Date::Month>(month + 1));
-    // date.set_day(static_cast<Glib::Date::Day>(atoi (substrs[1])));
-    // date.set_year(static_cast<Glib::Date::Year>(atoi (substrs[2])));
+    date.set_month(static_cast<Glib::Date::Month>(month + 1));
+    date.set_day(static_cast<Glib::Date::Day>(atoi (substrs[1])));
+    date.set_year(static_cast<Glib::Date::Year>(atoi (substrs[2])));
 
-    // regex_substr_free (&substrs, count);
+    regex_substr_free (&substrs, count);
 
     return date;
 }
 
-// gchar *
-// date_to_string (GDate *date)
-// {
-//     gchar *buf = g_malloc(16);
-//     g_date_strftime (buf, 16, "%Y-%m-%d", date);
-//     return buf;
-// }
+Glib::ustring date_to_string (const Glib::Date& date)
+{
+    char buf[16];
+    g_date_strftime (buf, 16, "%Y-%m-%d", date.gobj());
+    return buf;
+}
 
 gint
 regex_substr (const gchar *text, gchar *regex_text, gchar ***result)

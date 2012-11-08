@@ -25,7 +25,7 @@ public:
     void SetUrl(const Glib::ustring& url) { this->url = url; }
     const Glib::Date& GetLastDate() const { return last_date; }
 
-    Glib::SignalProxy0<void> signal_UpdateFinished();
+    sigc::signal<void> signal_UpdateFinished;
 
 private:
     void DownloadFinishedCallback();

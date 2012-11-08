@@ -13,8 +13,8 @@ Timer::Timer(Watcher& watcher, Settings& settings, Presenter& presenter,
     , settings(settings)
     , presenter(presenter)
 {
-    watcher.signal_UpdateFinished().connect(sigc::mem_fun(*this, &Timer::WatcherFinishedCallback));
-    presenter.signal_MadeChoice().connect(sigc::mem_fun(*this, &Timer::PresenterMadeChoiceCallback));
+    watcher.signal_UpdateFinished.connect(sigc::mem_fun(*this, &Timer::WatcherFinishedCallback));
+    presenter.signal_MadeChoice.connect(sigc::mem_fun(*this, &Timer::PresenterMadeChoiceCallback));
 }
 
 void Timer::Start()

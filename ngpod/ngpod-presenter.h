@@ -19,7 +19,7 @@ public:
     void ShowError(const Glib::ustring& msg);
     bool IsAccepted() const { return is_accepted; }
 
-    Glib::SignalProxy0<void> signal_MadeChoice();
+    sigc::signal<void> signal_MadeChoice;
 
 private:
     void ShowWindow ();
