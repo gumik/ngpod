@@ -38,7 +38,6 @@ Watcher::Status Watcher::Tick(const DateTime& now)
 
 void Watcher::DownloadFinishedCallback ()
 {
-    Watcher::Status status = INVALID;
     Downloader::Status downloader_status = downloader.GetStatus();
     const Date& date = downloader.GetDate();
 
@@ -59,7 +58,7 @@ void Watcher::DownloadFinishedCallback ()
             break;
     }
 
-    status = UPDATED;
+    status = Watcher::UPDATED;
     signal_UpdateFinished();
 }
 
