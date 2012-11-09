@@ -52,7 +52,7 @@ RefPtr<Builder> Presenter::GetBuilder ()
     gsize data_length = 0;
     gconstpointer data = g_bytes_get_data (gui_bytes, &data_length);
     RefPtr<Builder> builder = Builder::create();
-    ustring resources_string(static_cast<const char*>(data), data_length);
+    ustring resources_string(static_cast<const char*>(data));
     builder->add_from_string(resources_string);
     g_bytes_unref (gui_bytes);
     return builder;
@@ -67,7 +67,7 @@ void Presenter::ShowWindow ()
         window = RefPtr<Window>::cast_static(builder->get_object("picture-dialog"));
 
         RefPtr<Image> image = RefPtr<Image>::cast_static(builder->get_object("image"));
-        RefPtr<Label> description_label = RefPtr<Label>::cast_static(builder->get_object("description_label"));
+        RefPtr<Label> description_label = RefPtr<Label>::cast_static(builder->get_object("description-label"));
 
         accept_btn = RefPtr<Button>::cast_static(builder->get_object("accept_button"));
         deny_btn = RefPtr<Button>::cast_static(builder->get_object("refuse_button"));
@@ -102,6 +102,7 @@ void Presenter::HideWindow ()
 {
     if (window)
     {
+        window->set_visible(false);
         window.reset();
     }
 }
@@ -158,15 +159,11 @@ void Presenter::DenyButtonClickedCallback ()
 
 void Presenter::SetAdjustedDescription (RefPtr<Label> description_label)
 {
-    char *d1 = g_str_replace (description.c_str(), "em>", "i>");
-    char *d2 = g_str_replace (d1, "<br>", "");
-    char *d3 = g_str_replace (d2, "strong>", "b>");
+    ustring d1 = StrReplace(description, "em>", "i>");
+    ustring d2 = StrReplace (d1, "<br>", "");
+    ustring d3 = StrReplace (d2, "strong>", "b>");
 
     description_label->set_markup(d3);
-
-    g_free (d1);
-    g_free (d2);
-    g_free (d3);
 }
 
 }

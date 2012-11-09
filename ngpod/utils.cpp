@@ -1,6 +1,9 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <glib.h>
+#include <glibmm.h>
+
+using namespace Glib;
 
 // guint
 // create_void_void_signal (const gchar *signal_name)
@@ -128,11 +131,20 @@ regex_substr_free (gchar ***result, gint count)
     }
 }
 
-gchar *
-g_str_replace (const gchar *input, const gchar *search, const gchar *replace)
+Glib::ustring StrReplace (const Glib::ustring& input, const Glib::ustring& search, const Glib::ustring& replace)
 {
-    gchar **tokens = g_strsplit (input, search, 0);
-    gchar *replaced = g_strjoinv (replace, tokens);
-    g_strfreev (tokens);
-    return replaced;
+    ustring result;
+
+    int prev = 0;
+    int i = 0;
+    while ((i = input.find(search, prev)) != ustring::npos)
+    {
+        result += input.substr(prev, i);
+        result += replace;
+        prev = i + replace.size();
+    }
+
+    result += input.substr(prev, i);
+
+    return result;
 }
