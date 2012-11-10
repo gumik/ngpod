@@ -10,6 +10,7 @@
 #include "ngpod-timer.h"
 #include "ngpod-settings.h"
 #include "ngpod-presenter.h"
+#include "XfceWallpaper.h"
 #include "config.h"
 #include "utils.h"
 
@@ -115,7 +116,7 @@ int main (int argc, char **argv)
     Downloader downloader;
     Watcher watcher(downloader, last_date, time_span);
     Presenter presenter;
-    Wallpaper wallpaper(dir);
+    XfceWallpaper wallpaper(dir);
     ngpod::Timer timer(watcher, settings, presenter, wallpaper);
 
     timer.Start();

@@ -5,7 +5,7 @@
 #include "ngpod-watcher.h"
 #include "ngpod-settings.h"
 #include "ngpod-presenter.h"
-#include "ngpod-wallpaper.h"
+#include "AbstractWallpaper.h"
 
 namespace ngpod
 {
@@ -14,7 +14,7 @@ class Timer
 {
 public:
     Timer(Watcher& watcher, Settings& settings, Presenter& presenter,
-        Wallpaper& wallpaper);
+        AbstractWallpaper& wallpaper);
     void Start();
 
 private:
@@ -27,7 +27,7 @@ private:
     Watcher& watcher;
     Settings& settings;
     Presenter& presenter;
-    Wallpaper& wallpaper;
+    AbstractWallpaper& wallpaper;
 
     static const int NOT_NEEDED_TIMEOUT = 60;
     static const int FAILED_TIMEOUT = 60;

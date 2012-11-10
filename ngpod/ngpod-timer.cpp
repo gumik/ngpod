@@ -7,7 +7,7 @@ namespace ngpod
 {
 
 Timer::Timer(Watcher& watcher, Settings& settings, Presenter& presenter,
-    Wallpaper& wallpaper)
+    AbstractWallpaper& wallpaper)
     : watcher(watcher)
     , wallpaper(wallpaper)
     , settings(settings)
@@ -94,20 +94,16 @@ void Timer::PresenterMadeChoiceCallback()
 {
     if (presenter.IsAccepted())
     {
-        GError *error = NULL;
-
         const Downloader& downloader = watcher.GetDownloader();
         const char * data = downloader.GetData();
         int data_length = downloader.GetDataLength();
 
-        if (!wallpaper.SetFromData(data, data_length, &error))
+        AbstractWallpaper::Result result = wallpaper.SetFromData(data, data_length);
+        if (!result.first)
         {
-            GString *msg = g_string_new ("");
-            g_string_printf (msg, "Error while setting wallpaper:\n%s", error->message);
-            presenter.ShowError (msg->str);
-            log_message ("Timer", msg->str);
-            g_string_free (msg, TRUE);
-            g_error_free (error);
+            ustring msg = "Error while setting wallpaper:\n%s" + result.second;
+            presenter.ShowError (msg);
+            log_message ("Timer", msg.c_str());
         }
     }
 

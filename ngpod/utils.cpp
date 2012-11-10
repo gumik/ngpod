@@ -5,21 +5,11 @@
 
 using namespace Glib;
 
-// guint
-// create_void_void_signal (const gchar *signal_name)
-// {
-//     return g_signal_newv (
-//         signal_name,
-//         G_TYPE_OBJECT,
-//         G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-//         NULL /* closure */,
-//         NULL /* accumulator */,
-//         NULL /* accumulator data */,
-//         g_cclosure_marshal_VOID__VOID,
-//         G_TYPE_NONE /* return_type */,
-//         0     /* n_params */,
-//         NULL  /* param_types */);
-// }
+ustring GetPathFromDate(const DateTime& now, const ustring& dir)
+{
+    ustring filename = now.format("pod-%F.png");
+    return Glib::build_filename(dir, filename);
+}
 
 void
 log_message (const gchar *class_name, const gchar *format, ...)
@@ -81,7 +71,7 @@ Glib::ustring date_to_string (const Glib::Date& date)
 }
 
 gint
-regex_substr (const gchar *text, gchar *regex_text, gchar ***result)
+regex_substr (const gchar *text, const gchar *regex_text, gchar ***result)
 {
     GError *error = NULL;
     GRegex *regex = g_regex_new (regex_text, (GRegexCompileFlags)0, (GRegexMatchFlags)0, &error);
