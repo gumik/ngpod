@@ -4,7 +4,7 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_DEBUG}")
 
 project (ngpod)
 set (VERSION_MAJOR 0)
-set (VERSION_MINOR 1)
+set (VERSION_MINOR 2)
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/config.h.in"
