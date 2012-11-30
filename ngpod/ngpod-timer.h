@@ -6,6 +6,7 @@
 #include "ngpod-settings.h"
 #include "ngpod-presenter.h"
 #include "AbstractWallpaper.h"
+#include "Logger.h"
 
 namespace ngpod
 {
@@ -28,6 +29,7 @@ private:
     Settings& settings;
     Presenter& presenter;
     AbstractWallpaper& wallpaper;
+    Logger log;
 
     static const int NOT_NEEDED_TIMEOUT = 60;
     static const int FAILED_TIMEOUT = 60;

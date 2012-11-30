@@ -12,13 +12,15 @@
 #include "ngpod-presenter.h"
 #include "XfceWallpaper.h"
 #include "config.h"
-#include "utils.h"
+#include "Logger.h"
 
 using namespace ngpod;
 using namespace Glib;
 
-GMainLoop *main_loop;
+namespace
+{
 
+Logger logger("main");
 static ustring log_file;
 static GFileOutputStream *os = NULL;
 
@@ -64,17 +66,20 @@ static void log_to_file (const gchar *msg, gsize length)
 static void
 log_func (const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
 {
-    GDateTime *now = g_date_time_new_now_local ();
-    gchar *time_str = g_date_time_format (now, "%Y-%m-%d %H:%M:%S");
-    GString *msg = g_string_new ("");
+    // GDateTime *now = g_date_time_new_now_local ();
+    // gchar *time_str = g_date_time_format (now, "%Y-%m-%d %H:%M:%S");
+    // GString *msg = g_string_new ("");
 
-    g_string_printf (msg, "[%s] %s-%d: %s\n", time_str, log_domain, log_level, message);
-    g_print ("%s", msg->str);
+    // g_string_printf (msg, "[%s] %s-%d: %s\n", time_str, log_domain, log_level, message);
+    // g_print ("%s", msg->str);
 
-    log_to_file (msg->str, msg->len);
+    // log_to_file (msg->str, msg->len);
 
-    g_free (time_str);
-    g_string_free (msg, TRUE);
+    // g_free (time_str);
+    // g_string_free (msg, TRUE);
+    logger << log_domain << " " << message;
+}
+
 }
 
 int main (int argc, char **argv)
@@ -96,11 +101,11 @@ int main (int argc, char **argv)
     log_file = settings.GetLogFile();
     if (!log_file.empty())
     {
-        log_message ("main", "Log file: %s", log_file.c_str());
+        logger << "Log file:" << log_file;
     }
 
     Date last_date = settings.GetLastDate();
-    log_message ("main", "Last date: %d-%d-%d", last_date.get_year(), last_date.get_month(), last_date.get_day());
+    logger << "Last date: " << last_date.get_year() << "-" << last_date.get_month() << "-" << static_cast<int>(last_date.get_day());
 
     ustring dir = settings.GetDir();
     if (dir.empty())
@@ -108,10 +113,10 @@ int main (int argc, char **argv)
         g_print ("Set dir in config file\n");
         return 1;
     }
-    log_message ("main", "Dir: %s", dir.c_str());
+    logger << "Dir: " << dir;
 
     GTimeSpan time_span = settings.GetTimeSpan();
-    log_message ("main", "Time span: %dh %dmin", time_span / G_TIME_SPAN_HOUR, (time_span % G_TIME_SPAN_HOUR) / G_TIME_SPAN_MINUTE);
+    logger << "Time span: " << time_span / G_TIME_SPAN_HOUR << "h " << (time_span % G_TIME_SPAN_HOUR) / G_TIME_SPAN_MINUTE << "min";
 
     Downloader downloader;
     Watcher watcher(downloader, last_date, time_span);

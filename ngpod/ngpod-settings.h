@@ -3,6 +3,7 @@
 
 #include <glib-object.h>
 #include <glibmm/date.h>
+#include "Logger.h"
 
 namespace ngpod
 {
@@ -32,6 +33,7 @@ private:
     GKeyFile *key_file;
     Glib::ustring SETTINGS_PATH;
     Glib::ustring SETTINGS_DIR;
+    Logger log;
 };
 
 }

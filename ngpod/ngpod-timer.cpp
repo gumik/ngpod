@@ -1,5 +1,5 @@
 #include "ngpod-timer.h"
-#include "utils.h"
+#include "Logger.h"
 
 using namespace Glib;
 
@@ -12,6 +12,7 @@ Timer::Timer(Watcher& watcher, Settings& settings, Presenter& presenter,
     , wallpaper(wallpaper)
     , settings(settings)
     , presenter(presenter)
+    , log("Timer")
 {
     watcher.signal_UpdateFinished.connect(sigc::mem_fun(*this, &Timer::WatcherFinishedCallback));
     presenter.signal_MadeChoice.connect(sigc::mem_fun(*this, &Timer::PresenterMadeChoiceCallback));
@@ -37,7 +38,7 @@ void Timer::WatcherFinishedCallback()
     if (status == Watcher::NOT_NEEDED)
     {
         AddTimeout (NOT_NEEDED_TIMEOUT);
-        log_message ("Timer", "NOT_NEEDED");
+        log << "NOT_NEEDED";
     }
     else if (status == Watcher::UPDATED)
     {
@@ -47,23 +48,23 @@ void Timer::WatcherFinishedCallback()
         switch (downloader_status)
         {
             case Downloader::FAILED:
-                log_message ("Timer", "DOWNLOADER_FAILED");
+                log << "DOWNLOADER_FAILED";
                 AddTimeout(FAILED_TIMEOUT);
                 break;
 
             case Downloader::FAILED_GET_IMAGE:
-                log_message ("Timer", "DOWNLOADER_FAILED_GET_IMAGE");
+                log << "DOWNLOADER_FAILED_GET_IMAGE";
                 AddTimeout(FAILED_TIMEOUT);
                 break;
 
             case Downloader::SUCCESS_NO_IMAGE:
-                log_message ("Timer", "DOWNLOADER_SUCCESS_NO_IMAGE");
+                log << "DOWNLOADER_SUCCESS_NO_IMAGE";
                 UpdateLastDateInSettings();
                 AddTimeout(SUCCESS_NO_IMAGE_TIMEOUT);
                 break;
 
             case Downloader::SUCCESS:
-                log_message ("Timer", "DOWNLOADER_SUCCESS");
+                log << "DOWNLOADER_SUCCESS";
 
                 presenter.Notify(
                     downloader.GetData(),
@@ -75,7 +76,7 @@ void Timer::WatcherFinishedCallback()
     }
     else
     {
-        log_message ("Timer", "unknown NgpodWatcher status");
+        log << "unknown NgpodWatcher status";
     }
 }
 
@@ -103,7 +104,7 @@ void Timer::PresenterMadeChoiceCallback()
         {
             ustring msg = "Error while setting wallpaper:\n%s" + result.second;
             presenter.ShowError (msg);
-            log_message ("Timer", msg.c_str());
+            log << msg;
         }
     }
 

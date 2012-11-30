@@ -29,6 +29,7 @@ use_library (libsoup-2.4 LIBSOUP)
 use_library (mateconf-2.0 MATECONF)
 use_library (libxfconf-0 LIBXFCONF)
 use_library (libxml-2.0 LIBXML)
+find_package(Boost COMPONENTS date_time REQUIRED)
 
 add_custom_command (OUTPUT resources.c
                     COMMAND glib-compile-resources --generate-source resources.xml
@@ -37,4 +38,4 @@ add_custom_command (OUTPUT resources.c
 aux_source_directory (${PROJECT_SOURCE_DIR} SOURCES)
 add_executable(ngpod ${SOURCES} resources.c)
 
-target_link_libraries (ngpod ${LIBRARIES_LIST})
+target_link_libraries (ngpod ${LIBRARIES_LIST} ${Boost_LIBRARIES})

@@ -1,7 +1,7 @@
 #include <gio/gio.h>
 #include <glibmm.h>
 #include "ngpod-settings.h"
-#include "utils.h"
+#include "Logger.h"
 
 using namespace Glib;
 
@@ -14,6 +14,7 @@ Settings::~Settings()
 }
 
 Settings::Settings()
+    : log("Settings")
 {
     SETTINGS_DIR = build_filename (g_get_user_config_dir (), "gumik");
     SETTINGS_PATH = build_filename (SETTINGS_DIR, "ngpod-gtk.ini");
@@ -112,7 +113,7 @@ bool Settings::CreateConfigDir()
         if (error->code != G_IO_ERROR_EXISTS)
         {
             status = FALSE;
-            log_message ("Settings", "Cannot create settings directory: %s", error->message);
+            log << "Cannot create settings directory: " << error->message;
         }
 
         g_error_free (error);
@@ -131,7 +132,7 @@ void Settings::SaveSettings()
 
     if (error != NULL)
     {
-        log_message ("Settings", "Cannot save settings: %s", error->message);
+        log << "Cannot save settings: " << error->message;
         g_error_free (error);
     }
     else
@@ -145,14 +146,13 @@ void Settings::SaveSettings()
 
         if (error != NULL)
         {
-            log_message ("Settings", "Cannot save settings: %s", error->message);
+            log << "Cannot save settings: " << error->message;
             g_error_free (error);
         }
 
         if (length != bytes_written)
         {
-            log_message ("Settings", "Written %d bytes to settings file while should write %d",
-                bytes_written, length);
+            log << "Written " << bytes_written << " bytes to settings file while should write " << length;
         }
 
         g_free (data);

@@ -7,7 +7,6 @@
 #include <glibmm/datetime.h>
 
 Glib::ustring GetPathFromDate(const Glib::DateTime& now, const Glib::ustring& dir);
-void log_message (const gchar *class_name, const gchar *format, ...);
 Glib::Date date_from_string (const Glib::ustring& str);
 Glib::ustring date_to_string (const Glib::Date& date);
 gint regex_substr (const gchar *text, const gchar *regex_text, gchar ***result);

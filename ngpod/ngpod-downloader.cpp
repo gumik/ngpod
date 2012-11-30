@@ -1,7 +1,10 @@
 #include "ngpod-downloader.h"
 #include "utils.h"
+#include "Logger.h"
 #include <stdio.h>
 #include <glib.h>
+
+#define LOG_DOMAIN "Downloader"
 
 using namespace Glib;
 
@@ -19,6 +22,7 @@ Downloader::~Downloader()
 }
 
 Downloader::Downloader()
+    : log("Downloader")
 {
     session = soup_session_async_new ();
     data = NULL;
@@ -31,7 +35,7 @@ void Downloader::Start(const ustring& url)
 {
     SoupMessage *msg = soup_message_new("GET", url.c_str());
 
-    log_message ("Downloader", "start: %s", url.c_str());
+    log << "start: " << url;
 
     soup_session_queue_message (session, msg, Downloader::SiteDownloadCallbackStatic, this);
 }
@@ -81,7 +85,7 @@ void Downloader::SetDate (const char *data, int length)
 
     if (date.valid())
     {
-        log_message ("Downloader", "Date: %s", date_to_string (date).c_str());
+        log << "Date: " << date_to_string (date);
     }
 }
 
@@ -95,13 +99,13 @@ bool Downloader::SetLink(const char *data, int length)
 void Downloader::SetTitle (const char *data, int length)
 {
     title = GetXPathValue(data, length, "//*[@id=\"caption\"]/h2");
-    if (!title.empty()) log_message ("Downloader", "title: %s", title.c_str());
+    if (!title.empty()) log << "title: " << title;
 }
 
 void Downloader::SetDescription (const char *data, int length)
 {
     description = GetXPathValue(data, length, "//*[@id=\"caption\"]/p[4]");
-    if (!description.empty()) log_message ("Downloader", "description: %s", description.c_str());
+    if (!description.empty()) log << "description: " << description;
 }
 
 ustring Downloader::GetXPathValue (const char *data, guint length, const gchar *xpath)
@@ -164,7 +168,7 @@ ustring Downloader::GetXpathAttributeValue (const char *data, guint length, cons
 void Downloader::DownloadImage()
 {
     SoupMessage *msg = soup_message_new("GET", link.c_str());
-    log_message ("Downloader", "download_image: %s", link.c_str());
+    log << "download_image: " << link;
     soup_session_queue_message (session, msg, Downloader::ImageDownloadCallbackStatic, this);
 }
 
@@ -198,7 +202,7 @@ void Downloader::ImageDownloadCallback (SoupSession *session, SoupMessage *msg)
 
 void Downloader::EmitDownloadFinished ()
 {
-    log_message ("Downloader", "download_finished: %d", status);
+    log << "download_finished: " << status;
     signal_DownloadFinished();
 }
 

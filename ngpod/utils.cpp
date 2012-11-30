@@ -11,15 +11,6 @@ ustring GetPathFromDate(const DateTime& now, const ustring& dir)
     return Glib::build_filename(dir, filename);
 }
 
-void
-log_message (const gchar *class_name, const gchar *format, ...)
-{
-    va_list list;
-    va_start (list, format);
-    g_logv (class_name, G_LOG_LEVEL_MESSAGE, format, list);
-    va_end (list);
-}
-
 static const char *months[] =
 {
     "Jan",

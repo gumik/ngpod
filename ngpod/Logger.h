@@ -1,38 +1,80 @@
 #ifndef __NGPOD_LOGGER_H__
 #define __NGPOD_LOGGER_H__
 
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
 #include <iostream>
 
 namespace ngpod
 {
 
-class LoggerList
+class Log
 {
 public:
-    template <typename M>
-    LoggerList& operator<< (const M& msg)
+    Log(const std::string& line = "", bool valid = true)
+        : valid(valid)
     {
-        stream << msg;
+        stream = new std::stringstream();
+
+        using namespace boost::posix_time;
+        ptime now = second_clock::local_time();
+        *stream << "[" << to_simple_string(now) << "]";
+
+        if (!line.empty())
+        {
+            *stream << "[" << line << "]";
+        }
+
+        *stream << ": ";
+    }
+
+    Log(const Log& other)
+        : valid(true)
+    {
+        stream = other.stream;
+    }
+
+    ~Log()
+    {
+        if (valid)
+        {
+            std::cout << stream->str() << std::endl;
+            delete stream;
+        }
+    }
+
+    template <typename T>
+    Log& operator<<(const T& msg)
+    {
+        *stream << msg;
         return *this;
     }
 
-
-    std::stringstream stream;
+private:
+    Log& operator=(const Log&);
+    std::stringstream* stream;
+    bool valid;
 };
 
 class Logger
 {
 public:
-    void operator+=(const ngpod::LoggerList& list)
+    Logger(const std::string& domain)
+        : domain(domain)
     {
-        std::cout << "Date here: " << list.stream.str() << std::endl;
+
+    }
+
+    template <typename T>
+    Log operator<<(const T& msg)
+    {
+        return Log(domain, false) << msg;
     }
 
 private:
+    std::string domain;
 };
 
-#define LOG ngpod::Logger() += ngpod::LoggerList()
 }
 
 #endif /* __NGPOD_LOGGER_H__ */

@@ -10,6 +10,8 @@
 #include <libxml/HTMLparser.h>
 #include <libxml/HTMLtree.h>
 
+#include "Logger.h"
+
 namespace ngpod
 {
 
@@ -64,6 +66,7 @@ private:
     const char *data;
     int data_length;
     Status status;
+    Logger log;
 };
 
 }
