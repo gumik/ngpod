@@ -2,8 +2,9 @@
 #define __NGPOD_LOGGER_H__
 
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <sstream>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 
 namespace ngpod
 {
@@ -11,49 +12,52 @@ namespace ngpod
 class Log
 {
 public:
-    Log(const std::string& line = "", bool valid = true)
-        : valid(valid)
+    Log(bool valid) : valid(valid)
     {
-        stream = new std::stringstream();
-
-        using namespace boost::posix_time;
-        ptime now = second_clock::local_time();
-        *stream << "[" << to_simple_string(now) << "]";
-
-        if (!line.empty())
-        {
-            *stream << "[" << line << "]";
-        }
-
-        *stream << ": ";
+        sstream = new std::stringstream;
     }
 
     Log(const Log& other)
         : valid(true)
     {
-        stream = other.stream;
+        sstream = other.sstream;
     }
 
     ~Log()
     {
         if (valid)
         {
-            std::cout << stream->str() << std::endl;
-            delete stream;
+            std::cout << sstream->str() << std::endl;
+
+            if (file_stream.good())
+            {
+                file_stream << sstream->str() << std::endl;
+                file_stream.flush();
+            }
+
+            delete sstream;
         }
     }
 
     template <typename T>
     Log& operator<<(const T& msg)
     {
-        *stream << msg;
+        *sstream << msg;
         return *this;
+    }
+
+    static bool SetFile(const std::string& path)
+    {
+        file_stream.open(path.c_str(), std::ios_base::app);
+        return file_stream.good();
     }
 
 private:
     Log& operator=(const Log&);
-    std::stringstream* stream;
+    std::stringstream* sstream;
     bool valid;
+
+    static std::ofstream file_stream;
 };
 
 class Logger
@@ -68,7 +72,12 @@ public:
     template <typename T>
     Log operator<<(const T& msg)
     {
-        return Log(domain, false) << msg;
+        using namespace boost::posix_time;
+        ptime now = second_clock::local_time();
+
+        return Log(false) << "[" << to_simple_string(now) << "]"
+                          << "[" << domain << "]"
+                          << ": " << msg;
     }
 
 private:
