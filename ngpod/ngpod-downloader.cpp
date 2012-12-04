@@ -129,7 +129,7 @@ ustring Downloader::GetXPathValue (const char *data, guint length, const gchar *
             node = node->next;
         }
 
-        xpath_value.assign(reinterpret_cast<const char*>(nodeBuffer->content), nodeBuffer->use);
+        xpath_value.assign(reinterpret_cast<char*>(nodeBuffer->content));
         xmlBufferFree (nodeBuffer);
     }
 

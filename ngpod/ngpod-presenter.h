@@ -3,6 +3,7 @@
 
 #include <glibmm.h>
 #include <gtkmm.h>
+#include "Logger.h"
 
 namespace ngpod
 {
@@ -45,6 +46,7 @@ private:
     gsize data_length;
     Glib::ustring title;
     Glib::ustring description;
+    Logger logger;
 };
 
 }

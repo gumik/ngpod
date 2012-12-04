@@ -120,9 +120,9 @@ Glib::ustring StrReplace (const Glib::ustring& input, const Glib::ustring& searc
     int i = 0;
     while ((i = input.find(search, prev)) != ustring::npos)
     {
-        result += input.substr(prev, i);
+        result += input.substr(prev, i - prev);
         result += replace;
-        prev = i + replace.size();
+        prev = i + search.size();
     }
 
     result += input.substr(prev, i);

@@ -12,6 +12,7 @@ namespace ngpod
 {
 
 Presenter::Presenter()
+    : logger("Presenter")
 {
     data = NULL;
     data_length = 0;
@@ -162,6 +163,8 @@ void Presenter::SetAdjustedDescription (RefPtr<Label> description_label)
     ustring d1 = StrReplace(description, "em>", "i>");
     ustring d2 = StrReplace (d1, "<br>", "");
     ustring d3 = StrReplace (d2, "strong>", "b>");
+
+    logger << "Adjusted description: " << d3;
 
     description_label->set_markup(d3);
 }
