@@ -2,6 +2,7 @@
 #include "Logger.h"
 
 using namespace Glib;
+using namespace std;
 
 namespace ngpod
 {
@@ -102,7 +103,7 @@ void Timer::PresenterMadeChoiceCallback()
         AbstractWallpaper::Result result = wallpaper.SetFromData(data, data_length);
         if (!result.first)
         {
-            ustring msg = "Error while setting wallpaper:\n%s" + result.second;
+            string msg = "Error while setting wallpaper:\n%s" + result.second;
             presenter.ShowError (msg);
             log << msg;
         }

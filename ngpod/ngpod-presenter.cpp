@@ -7,6 +7,7 @@ using namespace Glib;
 using namespace Gtk;
 using namespace sigc;
 using namespace Gio;
+using namespace std;
 
 namespace ngpod
 {
@@ -25,7 +26,7 @@ Presenter::~Presenter()
     icon.reset();
 }
 
-void Presenter::Notify (const char *data, gsize data_length, const ustring& title, const ustring& description)
+void Presenter::Notify (const char *data, gsize data_length, const string& title, const string& description)
 {
     this->data = data;
     this->data_length = data_length;
@@ -41,7 +42,7 @@ void Presenter::Hide ()
     HideTray ();
 }
 
-void Presenter::ShowError (const ustring& msg)
+void Presenter::ShowError (const string& msg)
 {
     Gtk::Dialog dialog(msg, window);
     dialog.run();
@@ -53,7 +54,7 @@ RefPtr<Builder> Presenter::GetBuilder ()
     gsize data_length = 0;
     gconstpointer data = g_bytes_get_data (gui_bytes, &data_length);
     RefPtr<Builder> builder = Builder::create();
-    ustring resources_string(static_cast<const char*>(data));
+    string resources_string(static_cast<const char*>(data));
     builder->add_from_string(resources_string);
     g_bytes_unref (gui_bytes);
     return builder;
@@ -160,9 +161,9 @@ void Presenter::DenyButtonClickedCallback ()
 
 void Presenter::SetAdjustedDescription (RefPtr<Label> description_label)
 {
-    ustring d1 = StrReplace(description, "em>", "i>");
-    ustring d2 = StrReplace (d1, "<br>", "");
-    ustring d3 = StrReplace (d2, "strong>", "b>");
+    string d1 = StrReplace(description, "em>", "i>");
+    string d2 = StrReplace (d1, "<br>", "");
+    string d3 = StrReplace (d2, "strong>", "b>");
 
     logger << "Adjusted description: " << d3;
 

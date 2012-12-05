@@ -7,11 +7,12 @@
 #define LOG_DOMAIN "Downloader"
 
 using namespace Glib;
+using namespace std;
 
 namespace ngpod
 {
 
-ustring Downloader::DEFAULT_URL = "http://photography.nationalgeographic.com/photography/photo-of-the-day";
+string Downloader::DEFAULT_URL = "http://photography.nationalgeographic.com/photography/photo-of-the-day";
 
 Downloader::~Downloader()
 {
@@ -31,7 +32,7 @@ Downloader::Downloader()
     image_response_message = NULL;
 }
 
-void Downloader::Start(const ustring& url)
+void Downloader::Start(const string& url)
 {
     SoupMessage *msg = soup_message_new("GET", url.c_str());
 
@@ -80,7 +81,7 @@ void Downloader::SetDate (const char *data, int length)
 {
     date.clear();
 
-    ustring date_str = GetXPathValue (data, length, "//*[@id=\"caption\"]/p[1]");
+    string date_str = GetXPathValue (data, length, "//*[@id=\"caption\"]/p[1]");
     date = date_from_string (date_str);
 
     if (date.valid())
@@ -108,12 +109,12 @@ void Downloader::SetDescription (const char *data, int length)
     if (!description.empty()) log << "description: " << description;
 }
 
-ustring Downloader::GetXPathValue (const char *data, guint length, const gchar *xpath)
+string Downloader::GetXPathValue (const char *data, guint length, const gchar *xpath)
 {
     htmlDocPtr doc = htmlReadMemory (data, length, NULL, NULL, HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING | HTML_PARSE_NONET);
     xmlXPathContextPtr context = xmlXPathNewContext (doc);
     xmlXPathObjectPtr result = xmlXPathEvalExpression ((xmlChar *) xpath, context);
-    ustring xpath_value;
+    string xpath_value;
 
     if (!xmlXPathNodeSetIsEmpty (result->nodesetval))
     {
@@ -140,12 +141,12 @@ ustring Downloader::GetXPathValue (const char *data, guint length, const gchar *
     return xpath_value;
 }
 
-ustring Downloader::GetXpathAttributeValue (const char *data, guint length, const gchar *xpath, const gchar *attribute)
+string Downloader::GetXpathAttributeValue (const char *data, guint length, const gchar *xpath, const gchar *attribute)
 {
     htmlDocPtr doc = htmlReadMemory (data, length, NULL, NULL, HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING | HTML_PARSE_NONET);
     xmlXPathContextPtr context = xmlXPathNewContext (doc);
     xmlXPathObjectPtr result = xmlXPathEvalExpression ((xmlChar *) xpath, context);
-    ustring xpath_value;
+    string xpath_value;
 
     if (!xmlXPathNodeSetIsEmpty (result->nodesetval))
     {

@@ -1,14 +1,14 @@
 #include "Application.h"
 
 #include <boost/format.hpp>
+#include <glibmm.h>
 #include <iostream>
-#include <glibmm.h> // to remove
 
 #include "config.h"
 #include "Logger.h"
 
 using namespace boost;
-using namespace Glib; // to remove
+using namespace Glib;
 using namespace std;
 
 namespace ngpod
@@ -51,10 +51,10 @@ bool Application::Init()
     Date last_date = settings->GetLastDate();
     logger << "Last date: " << last_date.get_year() << "-" << last_date.get_month() << "-" << static_cast<int>(last_date.get_day());
 
-    ustring dir = settings->GetDir();
+    string dir = settings->GetDir();
     if (dir.empty())
     {
-        g_print ("Set dir in config file\n");
+        cout << "Set dir in config file" << endl;
         return false;
     }
     logger << "Dir: " << dir;

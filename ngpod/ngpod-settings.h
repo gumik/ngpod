@@ -19,10 +19,10 @@ public:
     void SetLastDate(const Glib::Date& date);
     Glib::Date GetLastDate() const;
 
-    void SetDir(const Glib::ustring& dir);
-    Glib::ustring GetDir() const;
+    void SetDir(const std::string& dir);
+    std::string GetDir() const;
 
-    Glib::ustring GetLogFile() const;
+    std::string GetLogFile() const;
 
     GTimeSpan GetTimeSpan() const;
 
@@ -31,8 +31,8 @@ private:
     void SaveSettings();
 
     GKeyFile *key_file;
-    Glib::ustring SETTINGS_PATH;
-    Glib::ustring SETTINGS_DIR;
+    std::string SETTINGS_PATH;
+    std::string SETTINGS_DIR;
     Logger log;
 };
 

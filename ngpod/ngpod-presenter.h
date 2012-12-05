@@ -14,10 +14,10 @@ public:
     Presenter();
     ~Presenter();
 
-    void Notify(const char* data, gsize data_length, const Glib::ustring& title,
-                const Glib::ustring& description);
+    void Notify(const char* data, gsize data_length, const std::string& title,
+                const std::string& description);
     void Hide();
-    void ShowError(const Glib::ustring& msg);
+    void ShowError(const std::string& msg);
     bool IsAccepted() const { return is_accepted; }
 
     sigc::signal<void> signal_MadeChoice;
@@ -44,8 +44,8 @@ private:
 
     const char *data;
     gsize data_length;
-    Glib::ustring title;
-    Glib::ustring description;
+    std::string title;
+    std::string description;
     Logger logger;
 };
 

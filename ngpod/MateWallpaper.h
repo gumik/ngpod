@@ -1,9 +1,6 @@
 #ifndef __NGPOD_MATEWALLPAPER_H__
 #define __NGPOD_MATEWALLPAPER_H__
 
-#include <glib.h>
-#include <glibmm.h>
-#include <glibmm/datetime.h>
 #include "AbstractWallpaper.h"
 
 namespace ngpod
@@ -12,10 +9,10 @@ namespace ngpod
 class MateWallpaper : public AbstractWallpaper
 {
 public:
-    MateWallpaper(const Glib::ustring& dir);
+    MateWallpaper(const std::string& dir);
 
 protected:
-    /*override*/ Result SetFromFile(const Glib::ustring& path);
+    /*override*/ Result SetFromFile(const std::string& path);
 };
 
 }

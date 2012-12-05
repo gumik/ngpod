@@ -1,24 +1,23 @@
 #include "XfceWallpaper.h"
 
 #include <xfconf/xfconf.h>
-#include "utils.h"
 
-using namespace Glib;
+using namespace std;
 
 namespace ngpod
 {
 
-XfceWallpaper::XfceWallpaper(const ustring& dir)
+XfceWallpaper::XfceWallpaper(const string& dir)
     : AbstractWallpaper(dir)
 {
 }
 
-AbstractWallpaper::Result XfceWallpaper::SetFromFile(const Glib::ustring& path)
+AbstractWallpaper::Result XfceWallpaper::SetFromFile(const std::string& path)
 {
     GError* error = NULL;
     if (!xfconf_init(&error))
     {
-        ustring msg = ustring("Cannot initialize xfconf: ") + error->message;
+        string msg = string("Cannot initialize xfconf: ") + error->message;
         g_error_free(error);
         return Result(false, msg);
     }

@@ -5,20 +5,21 @@
 
 using namespace Glib;
 using namespace Gio;
+using namespace std;
 
 namespace ngpod
 {
 
-AbstractWallpaper::AbstractWallpaper(const ustring& dir)
+AbstractWallpaper::AbstractWallpaper(const string& dir)
     : dir(dir)
 {
 }
 
-AbstractWallpaper::Result AbstractWallpaper::SetFromData(const char* data, uint length)
+AbstractWallpaper::Result AbstractWallpaper::SetFromData(const char* data, int length)
 {
     // Prepare path
     DateTime now = DateTime::create_now_local();
-    ustring path = GetPathFromDate (now, dir);
+    string path = GetPathFromDate (now, dir);
 
     // Write data to file
     RefPtr<File> file = File::create_for_path(path);

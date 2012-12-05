@@ -9,10 +9,10 @@ namespace ngpod
 class XfceWallpaper : public AbstractWallpaper
 {
 public:
-    XfceWallpaper(const Glib::ustring& dir);
+    XfceWallpaper(const std::string& dir);
 
 protected:
-    /*override*/ Result SetFromFile(const Glib::ustring& path);
+    /*override*/ Result SetFromFile(const std::string& path);
 };
 
 }

@@ -4,10 +4,11 @@
 #include <glibmm.h>
 
 using namespace Glib;
+using namespace std;
 
-ustring GetPathFromDate(const DateTime& now, const ustring& dir)
+string GetPathFromDate(const DateTime& now, const string& dir)
 {
-    ustring filename = now.format("pod-%F.png");
+    string filename = now.format("pod-%F.png");
     return Glib::build_filename(dir, filename);
 }
 
@@ -27,7 +28,7 @@ static const char *months[] =
     "Dec"
 };
 
-Glib::Date date_from_string (const Glib::ustring& sstr)
+Glib::Date date_from_string (const std::string& sstr)
 {
     const gchar *str = sstr.c_str();
     gchar **substrs;
@@ -54,7 +55,7 @@ Glib::Date date_from_string (const Glib::ustring& sstr)
     return date;
 }
 
-Glib::ustring date_to_string (const Glib::Date& date)
+std::string date_to_string (const Glib::Date& date)
 {
     char buf[16];
     g_date_strftime (buf, 16, "%Y-%m-%d", date.gobj());
@@ -112,13 +113,13 @@ regex_substr_free (gchar ***result, gint count)
     }
 }
 
-Glib::ustring StrReplace (const Glib::ustring& input, const Glib::ustring& search, const Glib::ustring& replace)
+std::string StrReplace (const std::string& input, const std::string& search, const std::string& replace)
 {
-    ustring result;
+    string result;
 
     int prev = 0;
     int i = 0;
-    while ((i = input.find(search, prev)) != ustring::npos)
+    while ((i = input.find(search, prev)) != string::npos)
     {
         result += input.substr(prev, i - prev);
         result += replace;

@@ -22,7 +22,7 @@ public:
     Status Tick(const Glib::DateTime& now);
     Status GetStatus() const { return status; }
     const Downloader& GetDownloader() const { return downloader; }
-    void SetUrl(const Glib::ustring& url) { this->url = url; }
+    void SetUrl(const std::string& url) { this->url = url; }
     const Glib::Date& GetLastDate() const { return last_date; }
 
     sigc::signal<void> signal_UpdateFinished;
@@ -35,7 +35,7 @@ private:
     Glib::Date last_date;
     GTimeSpan time_span;
     Status status;
-    Glib::ustring url;
+    std::string url;
 };
 
 }

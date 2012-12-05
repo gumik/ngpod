@@ -1,9 +1,11 @@
 #include <gio/gio.h>
 #include <glibmm.h>
+#include <string>
 #include "ngpod-settings.h"
 #include "Logger.h"
 
 using namespace Glib;
+using namespace std;
 
 namespace ngpod
 {
@@ -64,18 +66,18 @@ Date Settings::GetLastDate() const
     return date;
 }
 
-void Settings::SetDir (const ustring& dir)
+void Settings::SetDir (const string& dir)
 {
     g_key_file_set_string (key_file, "main", "dir", dir.c_str());
     SaveSettings();
 }
 
-ustring Settings::GetDir() const
+string Settings::GetDir() const
 {
     return g_key_file_get_string (key_file, "main", "dir", NULL);
 }
 
-ustring Settings::GetLogFile() const
+string Settings::GetLogFile() const
 {
     return g_key_file_get_string (key_file, "main", "log_file", NULL);
 }
