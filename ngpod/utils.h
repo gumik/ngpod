@@ -1,12 +1,13 @@
 #ifndef __NGPOD_UTILS_H
 #define __NGPOD_UTILS_H
 
+#include <boost/date_time.hpp>
 #include <glib-object.h>
 #include <glib.h>
 #include <glibmm/date.h>
 #include <glibmm/datetime.h>
 
-std::string GetPathFromDate(const Glib::DateTime& now, const std::string& dir);
+std::string GetPathFromDate(const boost::posix_time::ptime& now, const std::string& dir);
 Glib::Date date_from_string (const std::string& str);
 std::string date_to_string (const Glib::Date& date);
 gint regex_substr (const gchar *text, const gchar *regex_text, gchar ***result);

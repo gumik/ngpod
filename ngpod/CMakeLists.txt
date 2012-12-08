@@ -29,7 +29,7 @@ use_library (libsoup-2.4 LIBSOUP)
 use_library (mateconf-2.0 MATECONF)
 use_library (libxfconf-0 LIBXFCONF)
 use_library (libxml-2.0 LIBXML)
-find_package(Boost COMPONENTS date_time REQUIRED)
+find_package(Boost COMPONENTS date_time filesystem system REQUIRED)
 
 add_custom_command (OUTPUT resources.c
                     COMMAND glib-compile-resources --generate-source resources.xml

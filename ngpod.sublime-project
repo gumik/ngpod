@@ -10,6 +10,8 @@
 	{
 		"sublimeclang_options":
 		[
+			"-Wall",
+
 			"-I/usr/include/atkmm-1.6",
 			"-I/usr/include/giomm-2.4",
 			"-I/usr/lib/x86_64-linux-gnu/giomm-2.4/include",

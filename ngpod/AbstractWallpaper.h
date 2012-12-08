@@ -2,7 +2,6 @@
 #define __NGPOD_ABSTRACTWALLPAPER_H__
 
 #include <string>
-#include <glibmm/datetime.h>
 
 namespace ngpod
 {

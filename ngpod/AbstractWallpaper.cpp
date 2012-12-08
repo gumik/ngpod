@@ -1,10 +1,11 @@
 #include "AbstractWallpaper.h"
 
-#include <giomm.h>
+#include <boost/date_time.hpp>
+#include <fstream>
+
 #include "utils.h"
 
-using namespace Glib;
-using namespace Gio;
+using namespace boost::posix_time;
 using namespace std;
 
 namespace ngpod
@@ -18,26 +19,26 @@ AbstractWallpaper::AbstractWallpaper(const string& dir)
 AbstractWallpaper::Result AbstractWallpaper::SetFromData(const char* data, int length)
 {
     // Prepare path
-    DateTime now = DateTime::create_now_local();
+    ptime now = second_clock::local_time();
     string path = GetPathFromDate (now, dir);
 
     // Write data to file
-    RefPtr<File> file = File::create_for_path(path);
+    ofstream stream;
+    stream.open(path.c_str());
 
-    RefPtr<FileOutputStream> stream = file->create_file();
-
-    if (!stream)
+    if (!stream.good())
     {
         return Result(false, "Cannot create file: " + path);
     }
 
-    gsize bytes_written = 0;
-    if (!stream->write_all(data, length, bytes_written))
+    stream.write(data, length);
+    if (!stream.good())
     {
         return Result(false, "Cannot write to file: " + path);
     }
 
-    if (!stream->close())
+    stream.close();
+    if (!stream.good())
     {
         return Result(false, "Cannot close file: " + path);
     }

@@ -1,15 +1,25 @@
 #include "utils.h"
+#include <boost/date_time/date_facet.hpp>
+#include <boost/filesystem.hpp>
 #include <stdlib.h>
 #include <glib.h>
 #include <glibmm.h>
+#include <sstream>
 
 using namespace Glib;
 using namespace std;
+using namespace boost;
 
-string GetPathFromDate(const DateTime& now, const string& dir)
+string GetPathFromDate(const posix_time::ptime& now, const string& dir)
 {
-    string filename = now.format("pod-%F.png");
-    return Glib::build_filename(dir, filename);
+    stringstream ss;
+    gregorian::date_facet* facet = new gregorian::date_facet();
+    facet->set_iso_extended_format();
+    ss.imbue(locale(ss.getloc(), facet));
+    ss << "pod-" << now.date() << ".png";
+    filesystem::path path(dir);
+    path /= ss.str();
+    return path.string();
 }
 
 static const char *months[] =
