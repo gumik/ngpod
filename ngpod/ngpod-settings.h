@@ -2,7 +2,8 @@
 #define __NGPOD_SETTINGS_H__
 
 #include <glib-object.h>
-#include <glibmm/date.h>
+#include <boost/date_time/date.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "Logger.h"
 
 namespace ngpod
@@ -16,15 +17,15 @@ public:
 
     bool Initialize();
 
-    void SetLastDate(const Glib::Date& date);
-    Glib::Date GetLastDate() const;
+    void SetLastDate(const boost::gregorian::date& date);
+    boost::gregorian::date GetLastDate() const;
 
     void SetDir(const std::string& dir);
     std::string GetDir() const;
 
     std::string GetLogFile() const;
 
-    GTimeSpan GetTimeSpan() const;
+    boost::posix_time::time_duration GetTimeSpan() const;
 
 private:
     bool CreateConfigDir();

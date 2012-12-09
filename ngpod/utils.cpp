@@ -22,24 +22,24 @@ string GetPathFromDate(const posix_time::ptime& now, const string& dir)
     return path.string();
 }
 
-static const char *months[] =
+gregorian::date DateFromString (const std::string& sstr)
 {
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec"
-};
+    static const char *months[] =
+    {
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+    };
 
-Glib::Date date_from_string (const std::string& sstr)
-{
     const gchar *str = sstr.c_str();
     gchar **substrs;
     uint count = regex_substr (str, "([^<]{3})[^<]* ([^<]*), ([^<]*)", &substrs);
@@ -53,23 +53,12 @@ Glib::Date date_from_string (const std::string& sstr)
         }
     }
 
-    if (month >= 12) return Glib::Date();
+    if (month >= 12) return gregorian::date();
 
-    Glib::Date date;
-    date.set_month(static_cast<Glib::Date::Month>(month + 1));
-    date.set_day(static_cast<Glib::Date::Day>(atoi (substrs[1])));
-    date.set_year(static_cast<Glib::Date::Year>(atoi (substrs[2])));
-
+    gregorian::date date(atoi(substrs[2]), month + 1, atoi (substrs[1]));
     regex_substr_free (&substrs, count);
 
     return date;
-}
-
-std::string date_to_string (const Glib::Date& date)
-{
-    char buf[16];
-    g_date_strftime (buf, 16, "%Y-%m-%d", date.gobj());
-    return buf;
 }
 
 gint

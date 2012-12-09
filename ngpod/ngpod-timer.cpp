@@ -1,7 +1,12 @@
 #include "ngpod-timer.h"
+
+#include <boost/date_time.hpp>
+
 #include "Logger.h"
 
 using namespace Glib;
+using namespace boost::gregorian;
+using namespace boost::posix_time;
 using namespace std;
 
 namespace ngpod
@@ -10,9 +15,9 @@ namespace ngpod
 Timer::Timer(Watcher& watcher, Settings& settings, Presenter& presenter,
     AbstractWallpaper& wallpaper)
     : watcher(watcher)
-    , wallpaper(wallpaper)
     , settings(settings)
     , presenter(presenter)
+    , wallpaper(wallpaper)
     , log("Timer")
 {
     watcher.signal_UpdateFinished.connect(sigc::mem_fun(*this, &Timer::WatcherFinishedCallback));
@@ -26,7 +31,7 @@ void Timer::Start()
 
 bool Timer::Tick ()
 {
-    DateTime now = DateTime::create_now_local();
+    ptime now = second_clock::local_time();
     watcher.Tick(now);
 
     return false;
@@ -88,7 +93,7 @@ void Timer::AddTimeout (int seconds)
 
 void Timer::UpdateLastDateInSettings ()
 {
-    Date last_date = watcher.GetLastDate();
+    date last_date = watcher.GetLastDate();
     settings.SetLastDate(last_date);
 }
 

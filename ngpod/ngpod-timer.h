@@ -1,7 +1,6 @@
 #ifndef __NGPOD_TIMER_H__
 #define __NGPOD_TIMER_H__
 
-#include <glibmm.h>
 #include "ngpod-watcher.h"
 #include "ngpod-settings.h"
 #include "ngpod-presenter.h"

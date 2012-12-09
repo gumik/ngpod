@@ -1,12 +1,15 @@
 #include "ngpod-watcher.h"
 #include "utils.h"
 
+using namespace boost::gregorian;
+using namespace boost::posix_time;
 using namespace Glib;
 
 namespace ngpod
 {
 
-Watcher::Watcher(Downloader& downloader, const Glib::Date& last_date, GTimeSpan time_span)
+Watcher::Watcher(Downloader& downloader, const date& last_date,
+                 const time_duration& time_span)
     : downloader(downloader),
       last_date(last_date),
       time_span(time_span),
@@ -20,7 +23,7 @@ Watcher::~Watcher()
 {
 }
 
-Watcher::Status Watcher::Tick(const DateTime& now)
+Watcher::Status Watcher::Tick(const ptime& now)
 {
     if (IsDownloadNeeded(now))
     {
@@ -39,7 +42,7 @@ Watcher::Status Watcher::Tick(const DateTime& now)
 void Watcher::DownloadFinishedCallback ()
 {
     Downloader::Status downloader_status = downloader.GetStatus();
-    const Date& date = downloader.GetDate();
+    const date& date = downloader.GetDate();
 
     switch (downloader_status)
     {
@@ -62,18 +65,10 @@ void Watcher::DownloadFinishedCallback ()
     signal_UpdateFinished();
 }
 
-bool Watcher::IsDownloadNeeded(const DateTime& now) const
+bool Watcher::IsDownloadNeeded(const ptime& now) const
 {
-    gint last_year = last_date.get_year();
-    gint last_month = last_date.get_month();
-    gint last_day = last_date.get_day();
-
-    DateTime last_date_time = DateTime::create_local(last_year, last_month, last_day, 0, 0, 0);
-    DateTime last_date_time_added = last_date_time.add_days(1).add(time_span);
-
-    GTimeSpan diff = last_date_time_added.difference(now);
-
-    return diff <= 0;
+    ptime date(last_date + days(1), time_span);
+    return date < now;
 }
 
 }

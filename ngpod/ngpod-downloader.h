@@ -1,6 +1,7 @@
 #ifndef __NGPOD_DOWNLOADER_H__
 #define __NGPOD_DOWNLOADER_H__
 
+#include <boost/date_time/date.hpp>
 #include <glibmm/date.h>
 #include <glibmm/signalproxy.h>
 
@@ -31,7 +32,7 @@ public:
     virtual ~Downloader();
 
     void Start(const std::string& url);
-    const Glib::Date& GetDate() const { return date; }
+    const boost::gregorian::date& GetDate() const { return date; }
     const std::string& GetLink() const { return link; }
     const char* GetData() const { return data; }
     int GetDataLength() const { return data_length; }
@@ -59,7 +60,7 @@ private:
     static void ImageDownloadCallbackStatic(SoupSession *session, SoupMessage *msg, gpointer user_data);
 
     SoupSession *session;
-    Glib::Date date;
+    boost::gregorian::date date;
     std::string link;
     std::string title;
     std::string description;

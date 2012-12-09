@@ -4,6 +4,7 @@
 #include "ngpod-settings.h"
 #include "Logger.h"
 
+using namespace boost;
 using namespace Glib;
 using namespace std;
 
@@ -39,27 +40,27 @@ bool Settings::Initialize()
     return true;
 }
 
-void Settings::SetLastDate (const Date& date)
+void Settings::SetLastDate (const gregorian::date& date)
 {
-    gint list[] = { date.get_year(), date.get_month(), date.get_day() };
+    gint list[] = { date.year(), date.month(), date.day() };
     g_key_file_set_integer_list (key_file, "main", "last_date", list, 3);
     SaveSettings ();
 }
 
-Date Settings::GetLastDate() const
+gregorian::date Settings::GetLastDate() const
 {
     gsize length = 0;
     gint *list = g_key_file_get_integer_list (key_file, "main", "last_date", &length, NULL);
 
-    Date date;
+    gregorian::date date;
 
     if (list == NULL || length < 3)
     {
-        date = Date(Date::MONDAY, Date::JANUARY, 1);
+        date = gregorian::date(1, 1, 1);
     }
     else
     {
-        date = Date (static_cast<Date::Day>(list[2]), static_cast<Date::Month>(list[1]), list[0]);
+        date = gregorian::date (list[0], list[1], list[2]);
         g_free (list);
     }
 
@@ -82,18 +83,18 @@ string Settings::GetLogFile() const
     return g_key_file_get_string (key_file, "main", "log_file", NULL);
 }
 
-GTimeSpan Settings::GetTimeSpan() const
+posix_time::time_duration Settings::GetTimeSpan() const
 {
     gsize length = 0;
     gint *list = g_key_file_get_integer_list (key_file, "main", "time_span", &length, NULL);
 
-    GTimeSpan time_span = 0;
+    posix_time::time_duration time_span(0, 0, 0, 0);
 
     if (list != NULL && length == 2)
     {
         if (length == 2)
         {
-            time_span = G_TIME_SPAN_HOUR * list[0] + G_TIME_SPAN_MINUTE * list[1];
+            time_span = posix_time::time_duration(list[0], list[1], 0, 0);
         }
 
         g_free (list);

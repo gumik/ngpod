@@ -17,23 +17,24 @@ public:
         UPDATED
     };
 
-    Watcher(Downloader& downloader, const Glib::Date& last_date, GTimeSpan time_span);
+    Watcher(Downloader& downloader, const boost::gregorian::date& last_date,
+            const boost::posix_time::time_duration& time_span);
     virtual ~Watcher();
-    Status Tick(const Glib::DateTime& now);
+    Status Tick(const boost::posix_time::ptime& now);
     Status GetStatus() const { return status; }
     const Downloader& GetDownloader() const { return downloader; }
     void SetUrl(const std::string& url) { this->url = url; }
-    const Glib::Date& GetLastDate() const { return last_date; }
+    const boost::gregorian::date& GetLastDate() const { return last_date; }
 
     sigc::signal<void> signal_UpdateFinished;
 
 private:
     void DownloadFinishedCallback();
-    bool IsDownloadNeeded (const Glib::DateTime& now) const;
+    bool IsDownloadNeeded (const boost::posix_time::ptime& now) const;
 
     Downloader& downloader;
-    Glib::Date last_date;
-    GTimeSpan time_span;
+    boost::gregorian::date last_date;
+    boost::posix_time::time_duration time_span;
     Status status;
     std::string url;
 };

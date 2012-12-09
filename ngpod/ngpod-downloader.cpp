@@ -79,14 +79,16 @@ void Downloader::SiteDownloadCallback(SoupSession *session, SoupMessage* msg)
 
 void Downloader::SetDate (const char *data, int length)
 {
-    date.clear();
-
     string date_str = GetXPathValue (data, length, "//*[@id=\"caption\"]/p[1]");
-    date = date_from_string (date_str);
+    date = DateFromString(date_str);
 
-    if (date.valid())
+    if (date.year() > 2)
     {
-        log << "Date: " << date_to_string (date);
+        log << "Date: " << date;
+    }
+    else
+    {
+        log << "Date invalid";
     }
 }
 

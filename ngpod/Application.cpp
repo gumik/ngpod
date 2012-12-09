@@ -1,14 +1,15 @@
 #include "Application.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/format.hpp>
-#include <glibmm.h>
 #include <iostream>
 
 #include "config.h"
 #include "Logger.h"
 
 using namespace boost;
-using namespace Glib;
+using namespace boost::gregorian;
+using namespace boost::posix_time;
 using namespace std;
 
 namespace ngpod
@@ -48,8 +49,8 @@ bool Application::Init()
         }
     }
 
-    Date last_date = settings->GetLastDate();
-    logger << "Last date: " << last_date.get_year() << "-" << last_date.get_month() << "-" << static_cast<int>(last_date.get_day());
+    date last_date = settings->GetLastDate();
+    logger << "Last date: " << last_date.year() << "-" << last_date.month() << "-" << last_date.day();
 
     string dir = settings->GetDir();
     if (dir.empty())
@@ -59,8 +60,8 @@ bool Application::Init()
     }
     logger << "Dir: " << dir;
 
-    GTimeSpan time_span = settings->GetTimeSpan();
-    logger << "Time span: " << time_span / G_TIME_SPAN_HOUR << "h " << (time_span % G_TIME_SPAN_HOUR) / G_TIME_SPAN_MINUTE << "min";
+    time_duration time_span = settings->GetTimeSpan();
+    logger << "Time span: " << time_span;
 
     downloader.reset(new Downloader());
     watcher.reset(new Watcher(*downloader, last_date, time_span));
