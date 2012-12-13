@@ -61,6 +61,15 @@ gregorian::date DateFromString (const std::string& sstr)
     return date;
 }
 
+string GetConfigDir()
+{
+#ifdef __linux
+    return getenv("HOME");
+#else
+    throw "Not implemented";
+#endif
+}
+
 gint
 regex_substr (const gchar *text, const gchar *regex_text, gchar ***result)
 {

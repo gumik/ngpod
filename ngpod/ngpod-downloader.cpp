@@ -1,12 +1,10 @@
 #include "ngpod-downloader.h"
+
+#include <stdio.h>
+
 #include "utils.h"
 #include "Logger.h"
-#include <stdio.h>
-#include <glib.h>
 
-#define LOG_DOMAIN "Downloader"
-
-using namespace Glib;
 using namespace std;
 
 namespace ngpod
@@ -70,26 +68,10 @@ void Downloader::SiteDownloadCallback(SoupSession *session, SoupMessage* msg)
         return;
     }
 
-    SetDate (body->data, body->length);
     SetTitle (body->data, body->length);
     SetDescription (body->data, body->length);
 
     DownloadImage();
-}
-
-void Downloader::SetDate (const char *data, int length)
-{
-    string date_str = GetXPathValue (data, length, "//*[@id=\"caption\"]/p[1]");
-    date = DateFromString(date_str);
-
-    if (date.year() > 2)
-    {
-        log << "Date: " << date;
-    }
-    else
-    {
-        log << "Date invalid";
-    }
 }
 
 bool Downloader::SetLink(const char *data, int length)

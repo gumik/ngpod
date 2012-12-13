@@ -51,7 +51,9 @@
 
 			"-I/usr/include/libxml2",
 
-			"-I${folder:${project_path:main.cpp}}"
+			"-I${folder:${project_path:main.cpp}}",
+
+			"-ferror-limit=0"
 		]
 	}
 }

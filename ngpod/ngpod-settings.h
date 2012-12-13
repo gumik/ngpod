@@ -1,9 +1,9 @@
 #ifndef __NGPOD_SETTINGS_H__
 #define __NGPOD_SETTINGS_H__
 
-#include <glib-object.h>
 #include <boost/date_time/date.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include "Logger.h"
 
 namespace ngpod
@@ -31,7 +31,7 @@ private:
     bool CreateConfigDir();
     void SaveSettings();
 
-    GKeyFile *key_file;
+    boost::property_tree::ptree tree;
     std::string SETTINGS_PATH;
     std::string SETTINGS_DIR;
     Logger log;

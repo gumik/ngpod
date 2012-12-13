@@ -2,14 +2,11 @@
 #define __NGPOD_DOWNLOADER_H__
 
 #include <boost/date_time/date.hpp>
-#include <glibmm/date.h>
-#include <glibmm/signalproxy.h>
-
 #include <libsoup/soup.h>
 #include <libxml/xpath.h>
 #include <libxml/HTMLparser.h>
 #include <libxml/HTMLtree.h>
-
+#include <sigc++/sigc++.h>
 #include <string>
 
 #include "Logger.h"
@@ -32,7 +29,6 @@ public:
     virtual ~Downloader();
 
     void Start(const std::string& url);
-    const boost::gregorian::date& GetDate() const { return date; }
     const std::string& GetLink() const { return link; }
     const char* GetData() const { return data; }
     int GetDataLength() const { return data_length; }
@@ -51,7 +47,6 @@ private:
     void ImageDownloadCallback(SoupSession *session, SoupMessage *msg);
     bool SetLink(const char* data, int length);
     void SetTitle(const char* data, int length);
-    void SetDate(const char* data, int length);
     void SetDescription(const char* data, int length);
     void SiteDownloadCallback(SoupSession* session, SoupMessage* msg);
     static std::string GetXPathValue(const char *data, guint length, const gchar *xpath);
@@ -60,7 +55,6 @@ private:
     static void ImageDownloadCallbackStatic(SoupSession *session, SoupMessage *msg, gpointer user_data);
 
     SoupSession *session;
-    boost::gregorian::date date;
     std::string link;
     std::string title;
     std::string description;

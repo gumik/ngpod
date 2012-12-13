@@ -42,7 +42,7 @@ Watcher::Status Watcher::Tick(const ptime& now)
 void Watcher::DownloadFinishedCallback ()
 {
     Downloader::Status downloader_status = downloader.GetStatus();
-    const date& date = downloader.GetDate();
+    const date& date = boost::posix_time::second_clock::local_time().date();
 
     switch (downloader_status)
     {
