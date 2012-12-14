@@ -20,18 +20,19 @@ protected:
     virtual void InitGui() = 0;
     bool Init();
     virtual int StartGui() = 0;
+    virtual IPresenter* CreatePresenter() = 0;
 
     Logger logger;
     int& argc;
     char**& argv;
 
 private:
-    std::auto_ptr<ngpod::Downloader> downloader;
-    std::auto_ptr<ngpod::Watcher> watcher;
-    std::auto_ptr<ngpod::Presenter> presenter;
-    std::auto_ptr<ngpod::XfceWallpaper> wallpaper;
-    std::auto_ptr<ngpod::Timer> timer;
-    std::auto_ptr<ngpod::Settings> settings;
+    std::auto_ptr<Downloader> downloader;
+    std::auto_ptr<Watcher> watcher;
+    std::auto_ptr<IPresenter> presenter;
+    std::auto_ptr<XfceWallpaper> wallpaper;
+    std::auto_ptr<Timer> timer;
+    std::auto_ptr<Settings> settings;
 };
 
 }

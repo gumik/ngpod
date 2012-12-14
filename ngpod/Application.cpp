@@ -65,7 +65,7 @@ bool Application::Init()
 
     downloader.reset(new Downloader());
     watcher.reset(new Watcher(*downloader, last_date, time_span));
-    presenter.reset(new Presenter());
+    presenter.reset(CreatePresenter());
     wallpaper.reset(new XfceWallpaper(dir));
     timer.reset(new Timer(*watcher, *settings, *presenter, *wallpaper));
 

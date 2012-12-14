@@ -1,6 +1,7 @@
 #include "ngpod-timer.h"
 
 #include <boost/date_time.hpp>
+#include <glibmm.h>
 
 #include "Logger.h"
 
@@ -12,7 +13,7 @@ using namespace std;
 namespace ngpod
 {
 
-Timer::Timer(Watcher& watcher, Settings& settings, Presenter& presenter,
+Timer::Timer(Watcher& watcher, Settings& settings, IPresenter& presenter,
     AbstractWallpaper& wallpaper)
     : watcher(watcher)
     , settings(settings)

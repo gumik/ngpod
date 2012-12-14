@@ -3,24 +3,24 @@
 
 #include <glibmm.h>
 #include <gtkmm.h>
+
+#include "IPresenter.h"
 #include "Logger.h"
 
 namespace ngpod
 {
 
-class Presenter
+class GtkPresenter : public IPresenter
 {
 public:
-    Presenter();
-    ~Presenter();
+    GtkPresenter();
+    ~GtkPresenter();
 
-    void Notify(const char* data, gsize data_length, const std::string& title,
+    /*override*/ void Notify(const char* data, int data_length, const std::string& title,
                 const std::string& description);
-    void Hide();
-    void ShowError(const std::string& msg);
-    bool IsAccepted() const { return is_accepted; }
-
-    sigc::signal<void> signal_MadeChoice;
+    /*override*/ void Hide();
+    /*override*/ void ShowError(const std::string& msg);
+    /*override*/ bool IsAccepted() const { return is_accepted; }
 
 private:
     void ShowWindow ();

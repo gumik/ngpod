@@ -3,7 +3,7 @@
 
 #include "ngpod-watcher.h"
 #include "ngpod-settings.h"
-#include "ngpod-presenter.h"
+#include "IPresenter.h"
 #include "AbstractWallpaper.h"
 #include "Logger.h"
 
@@ -13,7 +13,7 @@ namespace ngpod
 class Timer
 {
 public:
-    Timer(Watcher& watcher, Settings& settings, Presenter& presenter,
+    Timer(Watcher& watcher, Settings& settings, IPresenter& presenter,
         AbstractWallpaper& wallpaper);
     void Start();
 
@@ -26,7 +26,7 @@ private:
 
     Watcher& watcher;
     Settings& settings;
-    Presenter& presenter;
+    IPresenter& presenter;
     AbstractWallpaper& wallpaper;
     Logger log;
 

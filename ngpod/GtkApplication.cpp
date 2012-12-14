@@ -1,5 +1,5 @@
 #include "GtkApplication.h"
-
+#include "GtkPresenter.h"
 
 
 namespace ngpod
@@ -22,6 +22,11 @@ int GtkApplication::StartGui()
 {
     app->hold();
     return app->run();
+}
+
+IPresenter* GtkApplication::CreatePresenter()
+{
+    return new GtkPresenter;
 }
 
 void GtkApplication::LogFunc(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
