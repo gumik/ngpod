@@ -3,7 +3,6 @@
 
 using namespace boost::gregorian;
 using namespace boost::posix_time;
-using namespace Glib;
 
 namespace ngpod
 {

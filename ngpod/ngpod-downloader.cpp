@@ -1,6 +1,6 @@
 #include "ngpod-downloader.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 #include "utils.h"
 #include "Logger.h"

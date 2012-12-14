@@ -1,11 +1,9 @@
 #include "AbstractTimer.h"
 
 #include <boost/date_time.hpp>
-#include <glibmm.h>
 
 #include "Logger.h"
 
-using namespace Glib;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
 using namespace std;
