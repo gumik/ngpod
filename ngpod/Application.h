@@ -2,7 +2,7 @@
 #define __NGPOD_APPLICATION_H__
 
 #include "Logger.h"
-#include "ngpod-timer.h"
+#include "AbstractTimer.h"
 #include "ngpod-watcher.h"
 #include "XfceWallpaper.h"
 #include "ngpod-settings.h"
@@ -21,6 +21,8 @@ protected:
     bool Init();
     virtual int StartGui() = 0;
     virtual IPresenter* CreatePresenter() = 0;
+    virtual AbstractTimer* CreateTimer(Watcher& watcher, Settings& settings,
+        IPresenter& presenter, AbstractWallpaper& wallpaper) = 0;
 
     Logger logger;
     int& argc;
@@ -31,7 +33,7 @@ private:
     std::auto_ptr<Watcher> watcher;
     std::auto_ptr<IPresenter> presenter;
     std::auto_ptr<XfceWallpaper> wallpaper;
-    std::auto_ptr<Timer> timer;
+    std::auto_ptr<AbstractTimer> timer;
     std::auto_ptr<Settings> settings;
 };
 

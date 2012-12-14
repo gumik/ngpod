@@ -1,5 +1,5 @@
-#ifndef __NGPOD_TIMER_H__
-#define __NGPOD_TIMER_H__
+#ifndef __NGPOD_ABSTRACTTIMER_H__
+#define __NGPOD_ABSTRACTTIMER_H__
 
 #include "ngpod-watcher.h"
 #include "ngpod-settings.h"
@@ -10,17 +10,19 @@
 namespace ngpod
 {
 
-class Timer
+class AbstractTimer
 {
 public:
-    Timer(Watcher& watcher, Settings& settings, IPresenter& presenter,
+    AbstractTimer(Watcher& watcher, Settings& settings, IPresenter& presenter,
         AbstractWallpaper& wallpaper);
     void Start();
 
-private:
+protected:
+    virtual void AddTimeout (int seconds) = 0;
     bool Tick ();
+
+private:
     void WatcherFinishedCallback ();
-    void AddTimeout (int seconds);
     void UpdateLastDateInSettings ();
     void PresenterMadeChoiceCallback ();
 
@@ -38,4 +40,4 @@ private:
 
 }
 
-#endif /* __NGPOD_TIMER_H__ */
+#endif /* __NGPOD_ABSTRACTTIMER_H__ */

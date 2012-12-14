@@ -1,6 +1,6 @@
 #include "GtkApplication.h"
 #include "GtkPresenter.h"
-
+#include "GtkTimer.h"
 
 namespace ngpod
 {
@@ -27,6 +27,12 @@ int GtkApplication::StartGui()
 IPresenter* GtkApplication::CreatePresenter()
 {
     return new GtkPresenter;
+}
+
+AbstractTimer* GtkApplication::CreateTimer(Watcher& watcher, Settings& settings,
+    IPresenter& presenter, AbstractWallpaper& wallpaper)
+{
+    return new GtkTimer(watcher, settings, presenter, wallpaper);
 }
 
 void GtkApplication::LogFunc(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)

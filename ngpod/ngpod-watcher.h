@@ -1,7 +1,6 @@
 #ifndef __NGPOD_WATCHER_H__
 #define __NGPOD_WATCHER_H__
 
-#include <glibmm/datetime.h>
 #include "ngpod-downloader.h"
 
 namespace ngpod

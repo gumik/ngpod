@@ -1,5 +1,5 @@
-#ifndef __NGPOD_PRESENTER_H__
-#define __NGPOD_PRESENTER_H__
+#ifndef __NGPOD_GTKPRESENTER_H__
+#define __NGPOD_GTKPRESENTER_H__
 
 #include <glibmm.h>
 #include <gtkmm.h>
@@ -51,4 +51,4 @@ private:
 
 }
 
-#endif /* __NGPOD_PRESENTER_H__ */
+#endif /* __NGPOD_GTKPRESENTER_H__ */

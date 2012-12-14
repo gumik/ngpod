@@ -1,4 +1,4 @@
-#include "ngpod-timer.h"
+#include "AbstractTimer.h"
 
 #include <boost/date_time.hpp>
 #include <glibmm.h>
@@ -13,24 +13,24 @@ using namespace std;
 namespace ngpod
 {
 
-Timer::Timer(Watcher& watcher, Settings& settings, IPresenter& presenter,
+AbstractTimer::AbstractTimer(Watcher& watcher, Settings& settings, IPresenter& presenter,
     AbstractWallpaper& wallpaper)
     : watcher(watcher)
     , settings(settings)
     , presenter(presenter)
     , wallpaper(wallpaper)
-    , log("Timer")
+    , log("AbstractTimer")
 {
-    watcher.signal_UpdateFinished.connect(sigc::mem_fun(*this, &Timer::WatcherFinishedCallback));
-    presenter.signal_MadeChoice.connect(sigc::mem_fun(*this, &Timer::PresenterMadeChoiceCallback));
+    watcher.signal_UpdateFinished.connect(sigc::mem_fun(*this, &AbstractTimer::WatcherFinishedCallback));
+    presenter.signal_MadeChoice.connect(sigc::mem_fun(*this, &AbstractTimer::PresenterMadeChoiceCallback));
 }
 
-void Timer::Start()
+void AbstractTimer::Start()
 {
     AddTimeout (1);
 }
 
-bool Timer::Tick ()
+bool AbstractTimer::Tick ()
 {
     ptime now = second_clock::local_time();
     watcher.Tick(now);
@@ -38,7 +38,7 @@ bool Timer::Tick ()
     return false;
 }
 
-void Timer::WatcherFinishedCallback()
+void AbstractTimer::WatcherFinishedCallback()
 {
     Watcher::Status status = watcher.GetStatus();
 
@@ -87,18 +87,13 @@ void Timer::WatcherFinishedCallback()
     }
 }
 
-void Timer::AddTimeout (int seconds)
-{
-    signal_timeout().connect_seconds(sigc::mem_fun(*this, &Timer::Tick), seconds);
-}
-
-void Timer::UpdateLastDateInSettings ()
+void AbstractTimer::UpdateLastDateInSettings ()
 {
     date last_date = watcher.GetLastDate();
     settings.SetLastDate(last_date);
 }
 
-void Timer::PresenterMadeChoiceCallback()
+void AbstractTimer::PresenterMadeChoiceCallback()
 {
     if (presenter.IsAccepted())
     {
