@@ -76,7 +76,7 @@ void Downloader::SiteDownloadCallback(SoupSession *session, SoupMessage* msg)
 
 bool Downloader::SetLink(const char *data, int length)
 {
-    static const gchar *xpath = "//*[@id=\"content_mainA\"]/div[1]/div/div[1]/div[2]/a";
+    static const gchar *xpath = "//*/div[@class=\"download_link\"]/a";
     link = GetXpathAttributeValue (data, length, xpath, "href");
     return !link.empty();
 }
